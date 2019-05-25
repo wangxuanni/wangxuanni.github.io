@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="不要小瞧基础呀!">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-02-20T14:49:17.866Z">
+<meta property="og:updated_time" content="2019-05-25T08:56:24.045Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="javaSE（上）">
 <meta name="twitter:description" content="不要小瞧基础呀!">
@@ -376,7 +376,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  4.6k
+                  4.5k
                 </span>
               
 
@@ -417,12 +417,7 @@
       
 
       
-        <h1 id="封装、继承、多态"><a href="#封装、继承、多态" class="headerlink" title="封装、继承、多态"></a>封装、继承、多态</h1><h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><p>访问修饰权限：<br>private（私有）, default（同一包）, public（共有）, protected（同一包和子孙类）<br>如果不写修饰符默认用default（package/friendly）修饰。<br><strong>default和protected区别：protected能访问子孙类，default不能。</strong></p>
-<p><u>什么情况用什么修饰符？</u></p>
-<ol>
-<li>属性通常使用private封装起来</li>
-<li>方法一般使用public用于被调用<br>3.<strong>会被子类继承的方法，通常使用protected</strong></li>
-</ol>
+        <h1 id="封装、继承、多态"><a href="#封装、继承、多态" class="headerlink" title="封装、继承、多态"></a>封装、继承、多态</h1><h2 id="封装"><a href="#封装" class="headerlink" title="封装"></a>封装</h2><p>访问修饰权限：<br>private（私有）, default（同一包）, public（共有）, protected（同一包和子孙类）<br>如果不写修饰符默认用default（package/friendly）修饰。<br><strong>default和protected区别：protected能访问子孙类，default不能。</strong><br><strong>会被子类继承的方法，通常使用protected</strong></p>
 <h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>接口和抽象类的主要区别？<br>从概念上来说<br>抽象类是一种对<strong>事物的抽象</strong>，而接口就像是一种约定，是一种对<strong>行为</strong>的抽象；<br>抽象类是对整个类整体进行抽象，包括属性、行为，但是接口却是对类局部（行为）进行抽象。<br>抽象类是一种模板式设计，而接口是一种<strong>行为规范</strong>，是一种辐射式设计。</p>
 <p>模板式设计：如果B和C都使用了公共模板A，如果他们的公共部分需要改动，那么只改动A就可以了；<br>辐射式设计：如果B和C都实现了公共接口A，如果现在要向A中添加新的方法，那么B和C都必须进行相应改动。</p>
 <p>区别1：<br><strong>一个类只能继承一个父类。<br>一个类可以实现多个接口</strong></p>
@@ -435,7 +430,8 @@
 <h2 id="多态"><a href="#多态" class="headerlink" title="多态"></a>多态</h2><p><strong>操作符</strong>的多态<br>加号+可以作为算数运算，也可以作为字符串连接。不同情境下，具备不同的作用<br>如果+号两侧都是整型，那么+代表数字<strong>相加</strong><br>如果+号两侧，任意一个是字符串，那么+代表<strong>字符串连接</strong></p>
 <p><strong>类</strong>的多态 比如<strong>父类的引用指向子类的对象</strong>、重写。</p>
 <p><u>下面程序的运行结果是？</u><br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">class Base</span><br><span class="line">&#123;</span><br><span class="line">    int num = 1;</span><br><span class="line">    public Base()&#123;</span><br><span class="line">        this.print();</span><br><span class="line">        num=2;</span><br><span class="line">    &#125;</span><br><span class="line">    public void print()&#123;</span><br><span class="line">        System.out.println(&quot;Base.num=&quot;+num);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class Sub extends Base&#123;</span><br><span class="line">    int num= 3;</span><br><span class="line">    public Sub()&#123;</span><br><span class="line">        this.print();</span><br><span class="line">        num=4;</span><br><span class="line">    &#125;</span><br><span class="line">    public void print()&#123;</span><br><span class="line">        System.out.println(&quot;Sub.num=&quot;+num);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">public class Test1 &#123;</span><br><span class="line">  public static void main(String[] args)</span><br><span class="line">  &#123;</span><br><span class="line">      Base b = new Sub();</span><br><span class="line">      System.out.println(b.num);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>在执行语句 Base b= new Sub时,会首先调用父类的构造方法,而在父类构造方法中调用了print()方法。<br>根<strong>据多态的特性,此时实例化的是sub类的对象,因此,会调用Sub类的print()方法。由于此时Sub类中的初始化代码 Int num=3还没有执行,因此,num的默认值为0,所以,输出为 Sub num=0。接着下一条语句父类num初始化为2。</strong><br>然后会调用子类的构造方法,根据初始化的顺序可知在调用子类构造方法时,非静态的变量会先执行初始化动作,所以,此时子类Sub的mum值为3,因此,调用 print方法会输出 Sub num=3。<br>接着输出b.num,由于b的类型为Base,<strong>而属性没有多态的概念</strong>因此,此时会输出父类中的mm值:2<br>程序的运行结果如下：<br>Sub.num=0<br>Sub.num=3<br>2<br>题目总结：当父类的引用指向子类的对象时，会先初始化父类。如果子类重写某方法，不管父类子类都是调用子类方法。另外属性没有多态的概念。</p>
+<p>在执行语句 Base b= new Sub时,会首先调用父类的构造方法。<strong>根据多态的特性,此时实例化的是sub类的对象,因此,base构造方法会调用Sub类的print()方法。由于此时Sub类中的初始化代码 Int num=3还没有执行,num的默认值为0,输出为 Sub num=0。</strong> 下一条语句父类num初始化为2。<br>然后会调用子类的构造方法,根据初始化的顺序可知在调用子类构造方法时,非静态的变量会先执行初始化动作,所以,此时子类Sub的mum值为3,因此,调用 print方法会输出 Sub num=3。<br>接着输出b.num,由于b的类型为Base,<strong>而属性没有多态的概念</strong>因此,此时会输出父类中的mm值:2<br>程序的运行结果如下：<br>Sub.num=0<br>Sub.num=3<br>2</p>
+<p>题目总结：1.当父类的引用指向子类的对象时，会先初始化父类。<br>2.如果子类重写某方法，不管父类子类都是调用子类方法。<br>3.属性没有多态的概念。</p>
 <h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="java初始化原则"><a href="#java初始化原则" class="headerlink" title="java初始化原则"></a>java初始化原则</h3><h3 id="对象属性初始化方法有3种"><a href="#对象属性初始化方法有3种" class="headerlink" title="对象属性初始化方法有3种"></a>对象属性初始化方法有3种</h3><ol>
 <li>声明该属性的时候初始化 </li>
 <li>构造方法中初始化</li>
