@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="css查漏补缺">
+<meta name="description" content="工厂模式+阻塞队列+创建线程方式改进">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CSS">
-<meta property="og:url" content="http://yoursite.com/2018/09/18/css/index.html">
+<meta property="og:title" content="自己实现简易线程池(下)">
+<meta property="og:url" content="http://yoursite.com/2019/05/26/自实现线程池（下）/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
-<meta property="og:description" content="css查漏补缺">
+<meta property="og:description" content="工厂模式+阻塞队列+创建线程方式改进">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-12-27T13:46:22.000Z">
+<meta property="og:updated_time" content="2019-06-01T11:47:42.187Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CSS">
-<meta name="twitter:description" content="css查漏补缺">
+<meta name="twitter:title" content="自己实现简易线程池(下)">
+<meta name="twitter:description" content="工厂模式+阻塞队列+创建线程方式改进">
 
 
 
@@ -121,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/09/18/css/">
+  <link rel="canonical" href="http://yoursite.com/2019/05/26/自实现线程池（下）/">
 
 
 
 
 
-  <title>CSS | Moonlight's blog</title>
+  <title>自己实现简易线程池(下) | Moonlight's blog</title>
   
 
 
@@ -293,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/09/18/css/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/26/自实现线程池（下）/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Moonlight">
@@ -310,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">CSS</h1>
+          <h1 class="post-title" itemprop="name headline">自己实现简易线程池(下)</h1>
         
 
         <div class="post-meta">
@@ -322,8 +322,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-18T14:00:50+08:00">
-                2018-09-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-26T22:24:50+08:00">
+                2019-05-26
               </time>
             
 
@@ -345,8 +345,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/前端/" itemprop="url" rel="index">
-                    <span itemprop="name">前端</span>
+                  <a href="/categories/java/" itemprop="url" rel="index">
+                    <span itemprop="name">java</span>
                   </a>
                 </span>
 
@@ -376,7 +376,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.2k
+                  834
                 </span>
               
 
@@ -392,7 +392,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  5min
+                  3min
                 </span>
               
             </div>
@@ -400,7 +400,7 @@
 
           
               <div class="post-description">
-                  css查漏补缺
+                  工厂模式+阻塞队列+创建线程方式改进
               </div>
           
 
@@ -417,51 +417,22 @@
       
 
       
-        <h1 id="css的三种写处"><a href="#css的三种写处" class="headerlink" title="css的三种写处"></a>css的三种写处</h1><h2 id="内联式"><a href="#内联式" class="headerlink" title="内联式"></a>内联式</h2><p><code>style=&quot;color:red;&quot;</code></p>
-<h2 id="嵌入式"><a href="#嵌入式" class="headerlink" title="嵌入式"></a>嵌入式</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;style&gt;</span><br><span class="line"></span><br><span class="line">&lt;/style&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="外部式"><a href="#外部式" class="headerlink" title="外部式"></a>外部式</h2><p>css外部式<br><code>&lt;link href=&quot;css/style.css&quot; rel=&quot;stylesheet&quot;&gt;</code></p>
-<p>js外部式<br><code>&lt;script type=&quot;text/javascript&quot; src=&quot;js/jquery-1.8.3.min.js&quot;&gt;&lt;/script&gt;</code></p>
-<h2 id="优先级：内联式-gt-嵌入式-gt-外部式"><a href="#优先级：内联式-gt-嵌入式-gt-外部式" class="headerlink" title="优先级：内联式 &gt; 嵌入式 &gt; 外部式"></a>优先级：内联式 &gt; 嵌入式 &gt; 外部式</h2><p>其实总结来说，就是–就近原则（离被设置元素越近优先级别越高）。</p>
-<h1 id="选择器"><a href="#选择器" class="headerlink" title="选择器"></a>选择器</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">p&#123; color:red;&#125;/*元素选择器*/</span><br><span class="line"></span><br><span class="line">#p1&#123;color:blue;&#125;/*id选择器*/</span><br><span class="line"></span><br><span class="line">.after&#123;color:green; &#125;/*类选择器*/</span><br><span class="line"></span><br><span class="line">*&#123;color:red;&#125;/*通用选择器*/</span><br><span class="line"></span><br><span class="line">a:hover&#123;color:red;&#125;/*伪类选择器*/</span><br><span class="line"></span><br><span class="line"> h1,span&#123;color:red;&#125;/*两个都*/</span><br></pre></td></tr></table></figure>
-<p>选择官方参考手册<a href="http://www.w3school.com.cn/cssref/css_selectors.asp" target="_blank" rel="noopener">http://www.w3school.com.cn/cssref/css_selectors.asp</a></p>
-<p>!important 注意要写在分号的前面，比如<br><code>a:hover{color:red!important;}/</code></p>
-<h1 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h1><p>这个慕课老师发了许多关于布局的课程，其中一些给人启发<br><a href="http://www.imooc.com/t/197450" target="_blank" rel="noopener">http://www.imooc.com/t/197450</a></p>
-<h2 id="一、基本知识"><a href="#一、基本知识" class="headerlink" title="一、基本知识"></a>一、基本知识</h2><ul>
-<li>块级元素<br>特点：<br>1.一个块级元素独占一行<br>2.元素的高度、宽度、行高以及顶和底边距都可设置。<br>常用的块状元素有：<br><code>&lt;div&gt;、&lt;p&gt;、&lt;h1&gt;、&lt;h6&gt;、&lt;ol&gt;、&lt;ul&gt;、&lt;dl&gt;、&lt;table&gt;、&lt;address&gt;、&lt;blockquote&gt; 、&lt;form&gt;</code></li>
-</ul>
+        <h1 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h1><p>有次面试，说起线程池，我无意中提起自己写过一个简易线程池。面试官问我了解工厂模式吗。晚上回来一查看，果然java线程池底层是用了工厂模式。<br>这挺好理解的，线程池工具类Executors的方法创建，比如FixedThreadPool固定线程池。点进方法去看是返回一个定义好初始化的参数线程池实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int</span><br><span class="line">nThreads) &#123;    return new ThreadPoolExecutor(nThreads, nThreads,0L, TimeUnit.MILLISECONDS,                                  new</span><br><span class="line">LinkedBlockingQueue&lt;Runnable&gt;());&#125;</span><br></pre></td></tr></table></figure></p>
+<p> 单例模式的好处是：</p>
 <ul>
-<li>内联元素<br>特点：<br>1.和其他元素都在一行上。<br>2.元素的高度、宽度及顶部和底部边距<strong>不可</strong>设置；<br>常用的内联元素有：<br><code>&lt;a&gt;、&lt;span&gt;、&lt;br&gt;、&lt;i&gt;、&lt;em&gt;、&lt;strong&gt;、&lt;label&gt;、&lt;q&gt;、&lt;var&gt;、&lt;cite&gt;、&lt;code&gt;</code></li>
+<li>用户只要知道名字就行了，比如我想创建一个固定长度的线程池，只需要调用newFixedThreadPool（）方法，而不需要在了解ThreadPoolExecutor构造函数之后自己new一个配置一堆参数。省心省力。</li>
+<li>而且如果不是java底层源码这种不会被修改的代码，构造函数的参数变了，所有用来new一个该地方的代码都得改。</li>
 </ul>
-<p>inline-block 元素特点：<br>1、和其他元素都在一行上；<br>2、元素的高度、宽度、行高以及顶和底边距都<strong>可</strong>设置。</p>
-<p>display:block  – 显示为块级元素<br>display:inline  – 显示为内联元素<br>display:inline-block – 显示为内联块元素，表现为同行显示并可修改宽高内外边距等属性</p>
-<p>tips：常将<ul>元素加上display:inline-block样式，原本垂直的列表就可以水平显示了。</ul></p>
-<h2 id="二、定位"><a href="#二、定位" class="headerlink" title="二、定位"></a>二、定位</h2><h3 id="float浮动定位"><a href="#float浮动定位" class="headerlink" title="float浮动定位"></a>float浮动定位</h3><p>float的设计初衷仅仅是-文字环绕效果<br>属性有left、right、none</p>
-<h3 id="positioin"><a href="#positioin" class="headerlink" title="positioin"></a>positioin</h3><p>relative相对定位：相对于它的初始位置而言移动。不可层叠。<br>absolute绝对定位：相对于最近的已定位的父元素。可层叠。<br>fixed悬浮定位：本质和absolute一样，不过不随浏览器滚动条向上或向下移动。</p>
-<h2 id="三、盒模型"><a href="#三、盒模型" class="headerlink" title="三、盒模型"></a>三、盒模型</h2><p>元素实际宽度（盒子的宽度）=左边界+左边框+左填充+内容宽度+右填充+右边框+右边界。</p>
-<h2 id="四、布局模型"><a href="#四、布局模型" class="headerlink" title="四、布局模型"></a>四、布局模型</h2><p>  1、流动模型（Flow）</p>
-<p>  2、浮动模型 (Float)<br>  float的设计初衷仅仅是-文字环绕效果<br>  3、层模型（Layer）</p>
-<h1 id="静态网页常用代码"><a href="#静态网页常用代码" class="headerlink" title="静态网页常用代码"></a>静态网页常用代码</h1><h2 id="1-如何将网页整体居中？"><a href="#1-如何将网页整体居中？" class="headerlink" title="1.如何将网页整体居中？"></a>1.如何将网页整体居中？</h2><ul>
-<li>方法一将整个网页放在一个大div容器下，容器设置margin和具体宽度。<br><code>&lt;div style=&quot;margin: 0 auto;width:1000px;&quot;&gt;</code><br>解释：上下边距为0，左右边距为自适应。</li>
-<li>方法二1.定义大div的宽度 2.把容器position睡醒设置为relative 3.把left属性设置为50%<br><code>&lt;div style=&quot;width:1000px;position:relative;left:50%;&quot;&gt;</code></li>
-</ul>
-<h2 id="2-如何消除默认样式？"><a href="#2-如何消除默认样式？" class="headerlink" title="2.如何消除默认样式？"></a>2.如何消除默认样式？</h2><p><code>2.&lt;body style=&quot;margin:0;padding:0;&quot;&gt;</code></p>
-<h2 id="3-如何隐藏滚动条？"><a href="#3-如何隐藏滚动条？" class="headerlink" title="3.如何隐藏滚动条？"></a>3.如何隐藏滚动条？</h2><ul>
-<li><p>方法一html { overflow-y: scroll; }<br> 原理：强制显示ie的垂直滚动条，而忽略水平滚动条<br> 优点：完全解决了这个问题, 允许你保持完整的XHTML doctype.<br> 缺点：即使页面不需要垂直滚动条的时候也会出现垂直滚动条。</p>
-</li>
-<li><p>方法2:html { overflow-x: hidden; overflow-y: auto; }<br> 原理：隐藏横向滚动，垂直滚动根据内容自适应<br> 优点：在视觉上解决了这个问题.在不必要的时候, 未强制垂直滚动条出现.<br> 缺点：只是隐藏了水平滚动条，如果页面真正需要水平滚动条的时候，<br> 屏幕以外的内容会因为用户无法水平滚动，而看不到。</p>
-</li>
-</ul>
-<h2 id="4-常用代码，搁这了，方便复制。"><a href="#4-常用代码，搁这了，方便复制。" class="headerlink" title="4.常用代码，搁这了，方便复制。"></a>4.常用代码，搁这了，方便复制。</h2><ul>
-<li><p>清除一些默认样式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">*&#123;margin:0;padding:0;&#125;</span><br><span class="line">body&#123;font-size:12px;&#125;</span><br><span class="line">img&#123;border:none;&#125;</span><br><span class="line">li&#123;list-style:none;&#125;</span><br><span class="line">input,select,textarea&#123;outline:none;&#125;</span><br><span class="line">textarea&#123;resize:none;&#125;</span><br><span class="line">a&#123;text-decoration:none;&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>刚开始肯定就是刷刷几个div包起来</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;div class=&quot;&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;div class=&quot;&quot;&gt;&lt;/div&gt;</span><br><span class="line">&lt;div class=&quot;&quot;&gt;&lt;/div&gt;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>Bootstrap框架引用代码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src=&quot;http://how2j.cn/study/js/jquery/2.0.0/jquery.min.js&quot;&gt;&lt;/script&gt;</span><br><span class="line">&lt;link href=&quot;http://how2j.cn/study/css/bootstrap/3.3.6/bootstrap.min.css&quot; rel=&quot;stylesheet&quot;&gt;</span><br><span class="line">&lt;script src=&quot;http://how2j.cn/study/js/bootstrap/3.3.6/bootstrap.min.js&quot;&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
+<h1 id="阻塞队列"><a href="#阻塞队列" class="headerlink" title="阻塞队列"></a>阻塞队列</h1><p>话不多说，大家看下面这个表格就全懂了。上一篇我是用syn锁住任务队列，工作线程wait和otify去实习生产者消费者，这篇用LinkedBlockingQueue的put和take方法来实现。如果试图的操作无法立即执行，这两个方法调用将会发生阻塞，直到能够执行。</p>
+<p>抛出 | 异常 | 特殊值 | 阻塞 | 超时<br>| — | — | — | — | — |<br>插入 | add(e) | offer(e) | put(e) | offer(e, time, unit)<br>移除 | remove() | poll() | take() | poll(time, unit)<br>检查 | element() | peek() | 不可用 | 不可用</p>
+<h2 id="创建线程方式改进"><a href="#创建线程方式改进" class="headerlink" title="创建线程方式改进"></a>创建线程方式改进</h2><p>还有上文文末提到过，线程池中的线程的创建不是在构造函数中，而是在有工作线程过来的时候才创建。<br>这次一并用这些知识点把之前的简易线程池升级重写一遍。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line">import java.util.HashSet;</span><br><span class="line">import java.util.Set;</span><br><span class="line">import java.util.concurrent.BlockingQueue;</span><br><span class="line">import java.util.concurrent.LinkedBlockingQueue;</span><br><span class="line"></span><br><span class="line">public class ThreadPool &#123;</span><br><span class="line">    //工作线程数</span><br><span class="line">    private int workerCount;</span><br><span class="line">    // 线程池大小</span><br><span class="line">    private int corePoolSize;</span><br><span class="line">    // 任务容器</span><br><span class="line">    private BlockingQueue&lt;Runnable&gt; workQueue;</span><br><span class="line">    //工作线程容器</span><br><span class="line">    private Set&lt;Worker&gt; workers;</span><br><span class="line">    // 任务容器</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    private static ThreadPool threadPool;</span><br><span class="line"></span><br><span class="line">    public static ThreadPool newThreadPool() &#123;</span><br><span class="line">        threadPool = new ThreadPool(3);</span><br><span class="line">        return threadPool;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private ThreadPool(int corePoolSize) &#123;</span><br><span class="line">        this.corePoolSize = corePoolSize;</span><br><span class="line">        //</span><br><span class="line">LinkedBlockingQueue的默认容量是Integer.MAX_VALUE，一直加任务线程可能会造成OOM内存溢出</span><br><span class="line">        workQueue = new LinkedBlockingQueue&lt;&gt;(1024);//这里指定大小</span><br><span class="line">        workers = new HashSet&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void execute(Runnable r) &#123;</span><br><span class="line">        if (workerCount &lt; corePoolSize) &#123;</span><br><span class="line">            addWorker(r);</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                workQueue.put(r);</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private void addWorker(Runnable r) &#123;</span><br><span class="line">        workerCount++;</span><br><span class="line">        Worker worker = new Worker(r);</span><br><span class="line">        Thread t = worker.thread;</span><br><span class="line">        workers.add(worker);</span><br><span class="line">        t.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    class Worker implements Runnable &#123;</span><br><span class="line">        Runnable task;</span><br><span class="line">        Thread thread;</span><br><span class="line"></span><br><span class="line">        public Worker(Runnable task) &#123;</span><br><span class="line">            this.task = task;</span><br><span class="line">            this.thread = new Thread(this);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        public void run() &#123;</span><br><span class="line">            while (true) &#123;</span><br><span class="line">                Runnable task = this.task;</span><br><span class="line">                // 执行当前的任务，所以把这个任务置空，以免造成死循环</span><br><span class="line">                this.task = null;</span><br><span class="line">                if (task != null || (task = getTask()) != null) &#123;</span><br><span class="line">                    task.run();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private Runnable getTask() &#123;</span><br><span class="line">        Runnable r = null;</span><br><span class="line">        try &#123;</span><br><span class="line">            r = workQueue.take();</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        return r;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">public class TestThreadPool &#123;</span><br><span class="line">    public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line"></span><br><span class="line">        ThreadPool threadPool=ThreadPool.newThreadPool();</span><br><span class="line">        //生成10个任务放入线程池</span><br><span class="line">        for (int i = 0; i &lt; 10; i++) &#123;</span><br><span class="line">            Runnable task=  new Runnable()&#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    System.out.println(&quot;做任务中。。。&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;;</span><br><span class="line">            threadPool.execute(task);</span><br><span class="line">            Thread.sleep(1000);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><a href="https://www.runoob.com/design-pattern/factory-pattern.html" target="_blank" rel="noopener">模式方面菜鸟教程写的不错</a></p>
+<p><a href="https://blog.csdn.net/qq_42135428/article/details/80285737" target="_blank" rel="noopener">Java高并发之BlockingQueue</a></p>
+<p><a href="https://blog.csdn.net/GitHub_boy/article/details/51046574" target="_blank" rel="noopener">https://blog.csdn.net/GitHub_boy/article/details/51046574</a></p>
+</blockquote>
 
       
     </div>
@@ -486,8 +457,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/08/数据结构读书笔记/" rel="next" title="《Data Structures and Other Objects Using Java》读书笔记">
-                <i class="fa fa-chevron-left"></i> 《Data Structures and Other Objects Using Java》读书笔记
+              <a href="/2019/05/26/线程池详解/" rel="next" title="java线程池详解">
+                <i class="fa fa-chevron-left"></i> java线程池详解
               </a>
             
           </div>
@@ -495,10 +466,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/09/27/Hibernate/" rel="prev" title="Hibernate简单入门">
-                Hibernate简单入门 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -632,7 +599,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#css的三种写处"><span class="nav-number">1.</span> <span class="nav-text">css的三种写处</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#内联式"><span class="nav-number">1.1.</span> <span class="nav-text">内联式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#嵌入式"><span class="nav-number">1.2.</span> <span class="nav-text">嵌入式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#外部式"><span class="nav-number">1.3.</span> <span class="nav-text">外部式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优先级：内联式-gt-嵌入式-gt-外部式"><span class="nav-number">1.4.</span> <span class="nav-text">优先级：内联式 &gt; 嵌入式 &gt; 外部式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#选择器"><span class="nav-number">2.</span> <span class="nav-text">选择器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#布局"><span class="nav-number">3.</span> <span class="nav-text">布局</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、基本知识"><span class="nav-number">3.1.</span> <span class="nav-text">一、基本知识</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、定位"><span class="nav-number">3.2.</span> <span class="nav-text">二、定位</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#float浮动定位"><span class="nav-number">3.2.1.</span> <span class="nav-text">float浮动定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#positioin"><span class="nav-number">3.2.2.</span> <span class="nav-text">positioin</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、盒模型"><span class="nav-number">3.3.</span> <span class="nav-text">三、盒模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、布局模型"><span class="nav-number">3.4.</span> <span class="nav-text">四、布局模型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#静态网页常用代码"><span class="nav-number">4.</span> <span class="nav-text">静态网页常用代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-如何将网页整体居中？"><span class="nav-number">4.1.</span> <span class="nav-text">1.如何将网页整体居中？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-如何消除默认样式？"><span class="nav-number">4.2.</span> <span class="nav-text">2.如何消除默认样式？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-如何隐藏滚动条？"><span class="nav-number">4.3.</span> <span class="nav-text">3.如何隐藏滚动条？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-常用代码，搁这了，方便复制。"><span class="nav-number">4.4.</span> <span class="nav-text">4.常用代码，搁这了，方便复制。</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#工厂模式"><span class="nav-number">1.</span> <span class="nav-text">工厂模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#阻塞队列"><span class="nav-number">2.</span> <span class="nav-text">阻塞队列</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建线程方式改进"><span class="nav-number">2.1.</span> <span class="nav-text">创建线程方式改进</span></a></li></ol></li></ol></div>
             
 
           </div>
