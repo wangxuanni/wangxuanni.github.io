@@ -42,19 +42,19 @@
     
     
     <entry>
-      <title>手写http服务器</title>
-      <link href="/2019/05/29/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%A6%E8%BF%AD%E4%BB%A3%E5%86%99http%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
-      <url>/2019/05/29/%E6%89%8B%E6%8A%8A%E6%89%8B%E5%B8%A6%E8%BF%AD%E4%BB%A3%E5%86%99http%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
+      <title>手写http服务器（一）</title>
+      <link href="/2019/05/29/%E6%89%8B%E5%86%99http%E6%9C%8D%E5%8A%A1%E5%99%A8/"/>
+      <url>/2019/05/29/%E6%89%8B%E5%86%99http%E6%9C%8D%E5%8A%A1%E5%99%A8/</url>
       
-        <content type="html"><![CDATA[<p>这里默认读者是连http服务器是啥一点概念都没有（但是得有网络编程基础），<br>会从最基本的概念讲起，一步步写一个服务器，大神就不要点进来看我献丑了hhh</p><h2 id="v1"><a href="#v1" class="headerlink" title="v1"></a>v1</h2><p><strong>百行代码内</strong>写一个能收到请求并返回响应的小小小服务器。</p><h1 id="v2"><a href="#v2" class="headerlink" title="v2"></a>v2</h1><p>升级为nio<br>如果不知道nio什么慕课有一个特别好的教程，老师讲的很清楚。</p><h1 id="v3"><a href="#v3" class="headerlink" title="v3"></a>v3</h1><p>进行封装 request接受请求并打印。response根据传入的状态码封装固定的头信息、推送响应信息。server只关心内容和状态码</p><p>待完善，计划下星期写这篇</p>]]></content>
+        <content type="html"><![CDATA[<blockquote><p>这里默认读者是连http服务器是啥一点概念都没有（但是得有网络编程基础），会从最基本的概念讲起，一步步写一个服务器，大神就不要点进来看我献丑了hhh</p></blockquote><h1 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h1><p><em>早在学jsp的时候，就很好奇tomcat是什么，为什么可以运行jsp、servlet？当时试图看业界盛誉的《how to tomcat work》，没看懂（但这确实是本神书）；问师兄，师兄也不太清楚。网上的博客就更不用说了。这个困惑就先被我放到一边去了。<br>寒假的时候写了一个聊天室，了解了socket、多线程是什么。<br>再后来，看一个直播，突然明白，其实tomcat就像一个聊天室的服务器啊，浏览器相当于客户端，HTTP请求响应相当于聊天消息字符串，浏览器给服务器发消息，服务器做处理。<br>只不过聊天的服务器是把收到的信息转发给其他客户端。而HTTP的服务的返回一个符合HTTP协议的消息。这就是一直被说烂的C/S与B/S。<br>最初的版本v1，能把收到的HTTP报文打印到控制台，能在浏览器打印一句话。我挺有成就感的。<br>后来发现github上比我大两三届的前辈也写过这个东西，但是他们有好多功能基于nio、servlet等等，代码量跟我不是一个级别的，像模像样。于是有了把这个当成自己的一个项目去完善的心态。看了许多书、博客、视频。最近还发现群里的小伙伴也有在写这个的。</em><br>写这个服务器的好处：</p><ul><li>可以学到多线程、nio。</li><li>成就感强。tomcat算比较适合自己造轮子的入门中间件。曾经也有写一个Spring的想法，但看了源码之后就放弃了。Spring源码优秀，适合参读，但不太适合自己撸一个。</li><li>对后台开发的眼界会</li></ul><h1 id="v1-（链接点我）"><a href="#v1-（链接点我）" class="headerlink" title="v1 （链接点我）"></a>v1 <a href="https://github.com/wangxuanni/MyTomcat/blob/master/src/v1/BioServer.java" target="_blank" rel="noopener">（链接点我）</a></h1><p><strong>百行代码内</strong>写一个能收到请求并返回响应的小小小服务器。</p><h2 id="技术点"><a href="#技术点" class="headerlink" title="技术点"></a>技术点</h2><ul><li>IO</li><li>Socket</li><li>缓存线程池</li><li>lambda表达式</li><li>HTTP请求响应报文</li></ul><h2 id="5个步骤的关键代码"><a href="#5个步骤的关键代码" class="headerlink" title="5个步骤的关键代码"></a>5个步骤的关键代码</h2><p>一、开启服务器绑定端口<br><code>ServerSocket serverSocket = new ServerSocket(8080);</code><br>二、一直循环等待<br><code>while（true）{</code><br>三、收到请求的套接字<br><code>Socket socket = serverSocket.accept();</code><br>四、套接字可以获得一个字节输入流，把这个输入流转成字符串，打印在控制台。<br><code>InputStream inputStream = socket.getInputStream();</code><br>五、创建响应报文（其实就是按照HTTP报文的格式构建的一个字符串）并返回响应<br><code>BufferedWriter bw =new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));</code></p><h2 id="注意一些小坑"><a href="#注意一些小坑" class="headerlink" title="注意一些小坑"></a>注意一些小坑</h2><p>缓存字符流写入后记得要刷新！！！bw.flush();<br>选择缓存线程池是因为它更适合短连接。<br>构建响应报文用StringBuilder比String更好<br>响应报文正文要构建好并且要记录长度，因为响应头有一个Content-length:正文长度属性要填<br>记得在finally块把socket.close()关闭</p><h1 id="v2"><a href="#v2" class="headerlink" title="v2"></a>v2</h1><p>升级为nio<br>如果不知道nio什么慕课有一个特别好的教程，老师讲的很清楚。</p><h1 id="v3"><a href="#v3" class="headerlink" title="v3"></a>v3</h1><p>进行封装 request接受请求并打印。response根据传入的状态码封装固定的头信息、推送响应信息。server只关心内容和状态码</p>]]></content>
       
       
+      <categories>
+          
+          <category> java </category>
+          
+      </categories>
       
-        <tags>
-            
-            <tag> java </tag>
-            
-        </tags>
       
     </entry>
     
