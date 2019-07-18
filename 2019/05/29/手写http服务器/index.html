@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="V1">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-06-27T13:46:00.684Z">
+<meta property="og:updated_time" content="2019-07-18T13:46:51.260Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="手写http服务器（一）">
 <meta name="twitter:description" content="V1">
@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.9k
+                  2k
                 </span>
               
 
@@ -433,7 +433,7 @@
 <h1 id="版本全览"><a href="#版本全览" class="headerlink" title="版本全览"></a>版本全览</h1><p>版本一：基于bio百行代码实现http服务器<br>版本二：基于nio<br>版本三：serlevt容器、cookie、封装、日志<br>版本四：长连接、参考了tomcat设计</p>
 <h1 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h1><p><em>早在学jsp的时候，就很好奇tomcat是什么，为什么可以运行jsp、servlet？当时试图看业界盛誉的《how to tomcat work》，没看懂（但这确实是本神书）；问师兄，师兄也不太清楚。网上的博客就更不用说了。这个困惑就先被我放到一边去了。<br>寒假的时候用socket、多线程写了一个聊天室。突然明白，其实tomcat就像一个聊天室的服务器啊，浏览器相当于客户端，HTTP请求响应相当于聊天消息，浏览器给服务器发消息，服务器做处理。http报文只是遵守一定格式的字符串。<br>只不过聊天室的服务器是把收到的信息转发给其他客户端。而HTTP的服务的返回一个符合HTTP协议的消息。<br>最初的版本v1，只能把收到的HTTP报文打印到控制台，返回浏览器响应显示一句话。<br>后来发现github上比我大一两届的前辈也写过这个东西，但是他们有好多功能比如基于nio、servlet等等，像模像样。受到启发，这项目认真起来大有搞头。就有了把这个当成自己的一个项目去完善的心态。看了一些书、博客、视频。最近还发现群里的小伙伴也有在写这个的，此处点名糖糖。</em><br>写这个服务器的好处：</p>
 <ul>
-<li>可以学到多线程、nio。</li>
+<li>写轮子所需几乎覆盖java所有知识点，因为即使是一个xml解析也要自己写，不像写后台一样有很多框架、工具可以用。</li>
 <li>成就感强。tomcat算比较适合自己造轮子的入门中间件。曾经也有写一个Spring的想法，但看了源码之后就放弃了。Spring源码优秀，适合参读，但不太适合自己撸一个。</li>
 <li>对后台开发的眼界会</li>
 </ul>
