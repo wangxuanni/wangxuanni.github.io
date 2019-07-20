@@ -83,14 +83,14 @@
 
 <meta name="description" content="工厂模式+阻塞队列+创建线程方式改进">
 <meta property="og:type" content="article">
-<meta property="og:title" content="阅读源码后我把自己实现的线程池改成了这样">
+<meta property="og:title" content="读源码后把自实现的线程池改成了这样">
 <meta property="og:url" content="http://yoursite.com/2019/06/01/自实现线程池（下）/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="工厂模式+阻塞队列+创建线程方式改进">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-07-19T12:37:00.310Z">
+<meta property="og:updated_time" content="2019-07-20T04:16:08.997Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="阅读源码后我把自己实现的线程池改成了这样">
+<meta name="twitter:title" content="读源码后把自实现的线程池改成了这样">
 <meta name="twitter:description" content="工厂模式+阻塞队列+创建线程方式改进">
 
 
@@ -127,7 +127,7 @@
 
 
 
-  <title>阅读源码后我把自己实现的线程池改成了这样 | Moonlight's blog</title>
+  <title>读源码后把自实现的线程池改成了这样 | Moonlight's blog</title>
   
 
 
@@ -310,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">阅读源码后我把自己实现的线程池改成了这样</h1>
+          <h1 class="post-title" itemprop="name headline">读源码后把自实现的线程池改成了这样</h1>
         
 
         <div class="post-meta">
@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  811
+                  851
                 </span>
               
 
@@ -427,7 +427,8 @@
       
 
       
-        <h1 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h1><p>昨天面试，说起线程池，我无意中提起自己写过一个简易线程池。面试官问我了解工厂模式吗。晚上回来一查看，果然java线程池底层是用了工厂模式。<br>这挺好理解的，线程池工具类Executors的方法创建，比如FixedThreadPool固定线程池。点进方法去看是返回一个定义好初始化的参数线程池实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int</span><br><span class="line">nThreads) &#123;    return new ThreadPoolExecutor(nThreads, nThreads,0L, TimeUnit.MILLISECONDS,                                  new</span><br><span class="line">LinkedBlockingQueue&lt;Runnable&gt;());&#125;</span><br></pre></td></tr></table></figure></p>
+        <p>本文分为三个部分：<br>一、如何实现一个简单的线程池？<br>二、jdk线程池源码分析<br>三、改进自实现的线程池</p>
+<h1 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h1><p>昨天面试，说起线程池，我无意中提起自己写过一个简易线程池。面试官问我了解工厂模式吗。晚上回来一查看，果然java线程池底层是用了工厂模式。<br>这挺好理解的，线程池工具类Executors的方法创建，比如FixedThreadPool固定线程池。点进方法去看是返回一个定义好初始化的参数线程池实例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int</span><br><span class="line">nThreads) &#123;    return new ThreadPoolExecutor(nThreads, nThreads,0L, TimeUnit.MILLISECONDS,                                  new</span><br><span class="line">LinkedBlockingQueue&lt;Runnable&gt;());&#125;</span><br></pre></td></tr></table></figure></p>
 <p> 单例模式的好处是：</p>
 <ul>
 <li>用户只要知道名字就行了，比如我想创建一个固定长度的线程池，只需要调用newFixedThreadPool（）方法，而不需要在了解ThreadPoolExecutor构造函数之后自己new一个配置一堆参数。省心省力。</li>
