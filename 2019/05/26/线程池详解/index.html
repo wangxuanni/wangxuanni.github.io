@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="java线程池详解">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-05-26T14:32:56.164Z">
+<meta property="og:updated_time" content="2019-07-29T09:33:35.591Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="java线程池详解">
 <meta name="twitter:description" content="java线程池详解">
@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.9k
+                  1.8k
                 </span>
               
 
@@ -402,7 +402,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  7min
+                  6min
                 </span>
               
             </div>
@@ -445,9 +445,8 @@
 <ul>
 <li>ArrayBlockingQueue;</li>
 <li>LinkedBlockingQueue;</li>
-<li>SynchronousQueue;<br>ArrayBlockingQueue和PriorityBlockingQueue使用较少，一般使用LinkedBlockingQueue和Synchronous。线程池的排队策略与BlockingQueue有关。</li>
+<li>SynchronousQueue;</li>
 </ul>
-<p>另外，threadFactory：线程工厂，主要用来创建线程。</p>
 <h3 id="拒绝策略"><a href="#拒绝策略" class="headerlink" title="拒绝策略"></a>拒绝策略</h3><p>handler：表示当处理任务时的四种拒绝策略：</p>
 <ul>
 <li>ThreadPoolExecutor.AbortPolicy:丢弃任务并<strong>抛出RejectedExecutionException异常</strong>。</li>
@@ -463,7 +462,8 @@
 <li>newWorkStealingPool:1.8版本出现，利用working-stealing算法，<strong>可窃取任务，并行处理</strong>，需要穿一个并行级别的参数，如果不传，则被设定为默认的CPU数量。</li>
 </ul>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService c= Executors.newCachedThreadPool();</span><br><span class="line">ExecutorService f= Executors.newFixedThreadPool(3);</span><br><span class="line">ScheduledExecutorService s= Executors.newScheduledThreadPool(5);</span><br><span class="line">ExecutorService sin= Executors.newSingleThreadExecutor(); </span><br><span class="line">// 设置并行级别为2，即默认每时每刻只有2个线程同时执行</span><br><span class="line">ExecutorService m = Executors.newWorkStealingPool(2);</span><br></pre></td></tr></table></figure>
-<h2 id="三、不要使用Executors默认创建线程池的方式"><a href="#三、不要使用Executors默认创建线程池的方式" class="headerlink" title="三、不要使用Executors默认创建线程池的方式"></a>三、不要使用Executors默认创建线程池的方式</h2><p>另外注意：不要使用Executors<strong>默认</strong>创建线程池的方式，这可能会导致OOM，因为LinkedBlockingQueue时未指定容量，将是一个无边界的阻塞队列，最大长度为Integer.MAX_VALUE。是可以不断的向队列中加入任务的，这种情况下就有可能因为任务过多而导致内存溢出问题。<br>上面提到的问题主要体现在newFixedThreadPool和newSingleThreadExecutor两个工厂方法上，并不是说newCachedThreadPool和newScheduledThreadPool这两个方法就安全了，这两种方式默认创建的最大线程数可能是Integer.MAX_VALUE，而创建这么多线程，必然就有可能导致OOM。<br>反例：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> ExecutorService executor = Executors.newFixedThreadPool(15);//不要这样做</span><br></pre></td></tr></table></figure></p>
+<h2 id="三、不要使用Executors默认创建线程池的方式"><a href="#三、不要使用Executors默认创建线程池的方式" class="headerlink" title="三、不要使用Executors默认创建线程池的方式"></a>三、不要使用Executors默认创建线程池的方式</h2><p>另外注意：不要使用Executors<strong>默认</strong>创建线程池的方式，这可能会导致OOM，因为LinkedBlockingQueue时未指定容量，将是一个无边界的阻塞队列，最大长度为Integer.MAX_VALUE。是可以不断的向队列中加入任务的，这种情况下就有可能因为任务过多而导致内存溢出问题。<br>上面提到的问题主要体现在newFixedThreadPool和newSingleThreadExecutor两个工厂方法上，并不是说newCachedThreadPool和newScheduledThreadPool这两个方法就安全了，这两种方式默认创建的最大线程数可能是Integer.MAX_VALUE，而创建这么多线程，必然就有可能导致OOM。<br>反例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"> ExecutorService executor = Executors.newFixedThreadPool(15);//不要这样做</span><br></pre></td></tr></table></figure>
 <p>正例<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService executor = new ThreadPoolExecutor(</span><br><span class="line">10, 10,60L, TimeUnit.SECONDS,new ArrayBlockingQueue(10));</span><br></pre></td></tr></table></figure></p>
 <h1 id="线程池类的社会关系"><a href="#线程池类的社会关系" class="headerlink" title="线程池类的社会关系"></a>线程池类的社会关系</h1><h2 id="关系"><a href="#关系" class="headerlink" title="关系"></a>关系</h2><p><code>ThreadPoolExecutor——&gt;AbstractExecutorService——&gt;ExecutorService——&gt;Executor</code><br>线程池类ThreadPoolExecutor在包java.util.concurrent下， 继承了AbstractExecutorService 抽象类，该抽象类实现了ExecutorService接口，而该接口继承了Executor接口</p>
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>Executor是一个顶层接口，在它里面只声明了一个方法execute(Runnable)，返回值为void，参数为Runnable类型，从字面意思可以理解，就是用来执行传进去的任务的；<br>ExecutorService接口声明了一些方法：submit、invokeAll、invokeAny以及shutDown等；<br>抽象类AbstractExecutorService基本实现了ExecutorService中声明的所有方法；<br>在ThreadPoolExecutor类中有几个非常重要的方法：</p>
