@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即**“以空间换时间”**的方式解决线程不安全问题。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-12T12:07:49.199Z">
+<meta property="og:updated_time" content="2019-08-12T13:49:49.622Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ThreadLocal源码分析">
 <meta name="twitter:description" content="线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即**“以空间换时间”**的方式解决线程不安全问题。">
@@ -345,8 +345,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index">
-                    <span itemprop="name">java</span>
+                  <a href="/categories/并发/" itemprop="url" rel="index">
+                    <span itemprop="name">并发</span>
                   </a>
                 </span>
 
@@ -449,7 +449,7 @@
 <p><strong>ThreadLocal使用了弱引用</strong>.key指向ThreadLocal实例，当ThreadLocal外部强引用被回收时候，key虽然还是指向ThreadLocal，但因为是弱引用，GC会发现并回收。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; &#123;</span><br><span class="line">       /** The value associated with this ThreadLocal. */</span><br><span class="line">       Object value;</span><br><span class="line"></span><br><span class="line">       Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">           super(k);</span><br><span class="line">           value = v;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
 <h3 id="清理时机"><a href="#清理时机" class="headerlink" title="清理时机"></a>清理时机</h3><p>线程退出时，会做一个清理工作，其中就包括清理ThreadLocalMap，即把threadLocals=null。</p>
-<p>而然使用<strong>线程池</strong>会对线程进行复用，就意味当前线程未必会退出，可能会出现内存泄露，即你不用这个对象了，但它无法被回收。因此最好使ThreadLocal.remove()方法将这个变量移除。</p>
+<p>而然使用线程池会对线程进行<strong>复用</strong>，就意味当前线程未必会退出，可能会出现内存泄露，即你不用这个对象了，但它无法被回收。因此最好使ThreadLocal.remove()方法将这个变量移除。</p>
 <blockquote>
 <p>参考</p>
 <p>《Java高并发程序设计》</p>
@@ -584,7 +584,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-count">9</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
