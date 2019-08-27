@@ -90,7 +90,7 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="file:///C:/Users/home.11/AppData/Local/Temp/SGPicFaceTpBq/8992/009C5D4E.png">
 <meta property="og:image" content="c:/Users/home.11/Desktop/小a笔记/images/多线程概念.png">
-<meta property="og:updated_time" content="2019-08-15T07:01:08.361Z">
+<meta property="og:updated_time" content="2019-08-27T10:45:36.057Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="多线程基础概念">
 <meta name="twitter:description" content="多线程基础概念">
@@ -389,7 +389,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  3.1k
+                  4.6k
                 </span>
               
 
@@ -405,7 +405,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  10min
+                  16min
                 </span>
               
             </div>
@@ -430,15 +430,82 @@
       
 
       
-        <h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>在学synchronized和volatile之前，我们先来了解一个概念——什么是线程安全？<br>线程安全简单来说就在多线程的情况下也不会有问题，看似一句废话，要怎么理解呢<br>比如ArrayList不是线程安全的就是一个线程不安全的类，<br>如果两个线程对可以同一个ArrayList进行add操作会出现什么结果？请看下面代码</p>
+        <h1 id="进程和线程的关系与区别？"><a href="#进程和线程的关系与区别？" class="headerlink" title="进程和线程的关系与区别？"></a>进程和线程的关系与区别？</h1><p>进程是资源分配的最小单元。线程是CPU调度的最小单元，一个Java程序对应着一个进程。</p>
+<table>
+<thead>
+<tr>
+<th>对比维度</th>
+<th>多进程</th>
+<th>多线程</th>
+<th>总结</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据共享、同步</td>
+<td>数据共享复杂，需要用IPC；数据是分开的，同步简单</td>
+<td>因为共享进程数据，数据共享简单，但也是因为这个原因导致同步复杂</td>
+<td>各有优势</td>
+</tr>
+<tr>
+<td>内存、CPU</td>
+<td>占用内存多，切换复杂，CPU利用率低</td>
+<td>占用内存少，切换简单，CPU利用率高</td>
+<td>线程占优</td>
+</tr>
+<tr>
+<td>创建销毁、切换</td>
+<td>创建销毁、切换复杂，速度慢</td>
+<td>创建销毁、切换简单，速度很快</td>
+<td>线程占优</td>
+</tr>
+<tr>
+<td>编程、调试</td>
+<td>编程简单，调试简单</td>
+<td>编程复杂，调试复杂</td>
+<td>进程占优</td>
+</tr>
+<tr>
+<td>可靠性</td>
+<td>进程间不会互相影响</td>
+<td>一个线程挂掉将导致整个进程挂掉</td>
+<td>进程占优</td>
+</tr>
+<tr>
+<td>分布式</td>
+<td>适应于多核、多机分布式；如果一台机器不够，扩展到多台机器比较简单</td>
+<td>适应于多核分布式</td>
+<td>进程占优</td>
+</tr>
+</tbody>
+</table>
+<h1 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h1><p>死锁是指两个或两个以上的事务在执行过程中，因争夺锁资源而造成的一种互相等待的现象，若无外力作用两个事务都无法推进，这样就产生了死锁。</p>
+<h2 id="四个必要条件"><a href="#四个必要条件" class="headerlink" title="四个必要条件"></a>四个必要条件</h2><p>四个条件缩写”一保夺环“</p>
+<ol>
+<li>互斥条件：即任何时刻，一个资源只能被一个进程使用。其他进程必须等待。</li>
+<li>请求和保持条件：即当资源请求者在请求其他的资源的同时保持对原有资源的占有且不释放。</li>
+<li>不剥夺条件：资源请求者不能强制从资源占有者手中夺取资源，资源只能由资源占有者主动释放。</li>
+<li>环路等待条件：比如A占有B在等待的资源（B等待A释放），B占有A在等待的资源（A等待B释放）。多个进程循环等待着相邻进程占用着的资源。</li>
+</ol>
+<p>避免死锁可以通过破环四个必要条件之一。</p>
+<h2 id="解决死锁的方法："><a href="#解决死锁的方法：" class="headerlink" title="解决死锁的方法："></a>解决死锁的方法：</h2><p>加锁顺序保持一致。不同的加锁顺序很可能导致死锁，比如哲学家问题：A先申请筷子1在申请筷子2，而B先申请筷子2在申请筷子1，最后谁也得不到一双筷子（同时拥有筷子1和筷子2）</p>
+<p>超时，为其中一个事务设置等待时间，若超过这个阈值事务就回滚，另一个等待的事务就能得以继续执行。比如可重入锁的超时等待</p>
+<p>数据库可以及时检测出死锁，选择一个牺牲者放弃事务，即回滚undo量最小的事务。一般是用等待图（wait-for gragh）深度优先搜索的算法实现，如果图中有环路就说明存在死锁。</p>
+<h2 id="死锁、活锁与饥饿"><a href="#死锁、活锁与饥饿" class="headerlink" title="死锁、活锁与饥饿"></a>死锁、活锁与饥饿</h2><p>死锁：指两个或两个以上的进程（或线程）在执行过程中，因争夺资源而造成的一种互相等待的现象，若无外力作用，它们都将<strong>无法推进下去</strong>。此时称系统处于死锁状态或系统产生了死锁，这些永远在互相等待的进程称为死锁进程。</p>
+<p>活锁：是指线程1可以使用资源，但它很礼貌，让其他线程先使用资源，线程2也可以使用资源，但它很绅士，也让其他线程先使用资源。<strong>这样你让我，我让你，最后两个线程都无法使用资源。</strong></p>
+<p>饥饿：通常因为<strong>线程优先级使用不当</strong>。是指如果线程T1占用了资源R，线程T2又请求封锁R，于是T2等待。T3也请求资源R，当T1释放了R上的封锁后，系统首先批准了T3的请求，T2仍然等待。然后T4又请求封锁R，当T3释放了R上的封锁之后，系统又批准了T4的请求……，<strong>T2可能永远等待</strong>。</p>
+<h1 id="java内存模型"><a href="#java内存模型" class="headerlink" title="java内存模型"></a>java内存模型</h1><p><em>注意：没有什么jvm内存模型，要么是Jvm运行时数据区，要么是Java内存模型.</em></p>
+<p>由来</p>
+<p>计算机采用<strong>结构化</strong>的存储，而存储设备与处理器的运算有几个数量级的差距，所以不得不加入一层读写速度尽可能接近处理器运算速度的<strong>高速缓存</strong>，来作为内存和处理器之间的缓存，将运算所需要用到的数据复制到缓存中，让运算能快速进行，当运算结束后再从缓存同步回忆内存之中。这也引起了一个新的问题，<strong>缓存一致性</strong>。<br>除此之外，处理器可能会对输入代码进行乱序执行优化，因此如果一个计算任务依赖另一个计算任务的中间结果，那么其顺序并不能靠代码的先后顺序来保证。</p>
+<p><em>插一句题外话，可不可计算机全部用内存，这样就不用考虑缓存一致性了？可以，比如说谷歌公司，他的搜索引擎的数据80%存在内存里面的，才会这么快。一般的小公司如果没有钱买这么大的内存是没办法跟他做竞争的。</em><br>那么至于Java的内存模型有什么关联呢？Java的内存模型中。主内存可以类比硬件的主内存，而每条线程的工作内存可以类比处理器高速缓存类。<br>这个变量是在修改后将辛识同步回族内存，在变量读取前从主内存刷新回变量值，这种衣内主内存作为传播媒介的方式来实现可见性的。<br>对一个变量执行，mx操作之前，必须把此变量同步回族内存中，一个变量在同一时刻只允许有一条进程对其进行加锁操作。<br>县城之间的状态转换，Java有5种现身状态，新建运行无期等待限期等待阻塞结束。</p>
+<h2 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h2><p>在学synchronized和volatile之前，我们先来了解一个概念——什么是线程安全？<br>线程安全简单来说就在多线程的情况下也不会有问题，看似一句废话，要怎么理解呢<br>比如ArrayList不是线程安全的就是一个线程不安全的类，<br>如果两个线程对可以同一个ArrayList进行add操作会出现什么结果？请看下面代码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest &#123;</span><br><span class="line">            static List&lt;Integer&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">            static class BB implements Runnable &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    for (int j = 0; j &lt; 10000; j++) &#123;</span><br><span class="line">                        list.add(j);</span><br><span class="line">                    &#125; &#125; &#125;</span><br><span class="line"></span><br><span class="line">public static void main(String[] args) throws InterruptedException&#123;</span><br><span class="line"></span><br><span class="line">                BB b = new BB();</span><br><span class="line">                Thread t1 = new Thread(b);</span><br><span class="line">                Thread t2 = new Thread(b);</span><br><span class="line">                t1.start();</span><br><span class="line">                t2.start();</span><br><span class="line">                t1.join();</span><br><span class="line">                t2.join();</span><br><span class="line"></span><br><span class="line">                System.out.println(list.size());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
-<p>问题出在add方法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public boolean add(E e) &#123;   ensureCapacityInternal(size + 1);   </span><br><span class="line">elementData[size++] = e;  </span><br><span class="line">return true;&#125;</span><br></pre></td></tr></table></figure></p>
+<p>问题出在add方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public boolean add(E e) &#123;   ensureCapacityInternal(size + 1);   </span><br><span class="line">elementData[size++] = e;  </span><br><span class="line">return true;&#125;</span><br></pre></td></tr></table></figure>
 <p>上面的程序，可能有三种情况发生：</p>
 <ul>
-<li><p>数组下标越界。首先要检查容量，必要时进行扩容。每当在数组边界处，如果A线程和B线程同时进入并检查容量，也就是它们都执行完ensureCapacityInternal方法，因为还有一个空间，所以不进行扩容，此时如果A暂停下来，B成功自增；然后接着A从 elementData[size++]=e开始执行，由于A之前已经检查过没有扩容，而B成功自增使得现在没有空余空间了，此时A就会发生数组下标越界。</p>
-</li>
-<li><p>小于20000。size++可以看成是 size=size+1，这一行代码包括三个步骤，先读取size，然后将size加1，最后将这个新值写回到size。此时若A和B线程同时读取到size假设为10，B先自增成功size变11，然后回来A因为它读到的size也是10，所以自增后写入size被更新成11，也就是说两次自增，实际上size只增大了1。因此最后的size会小于200。</p>
-</li>
+<li>数组下标越界。首先要检查容量，必要时进行扩容。每当在数组边界处，如果A线程和B线程同时进入并检查容量，也就是它们都执行完ensureCapacityInternal方法，因为还有一个空间，所以不进行扩容，此时如果A暂停下来，B成功自增；然后接着A从 elementData[size++]=e开始执行，由于A之前已经检查过没有扩容，而B成功自增使得现在没有空余空间了，此时A就会发生数组下标越界。</li>
+<li>小于20000。size++可以看成是 size=size+1，这一行代码包括三个步骤，先读取size，然后将size加1，最后将这个新值写回到size。此时若A和B线程同时读取到size假设为10，B先自增成功size变11，然后回来A因为它读到的size也是10，所以自增后写入size被更新成11，也就是说两次自增，实际上size只增大了1。因此最后的size会小于200。</li>
 <li>等于20000 很幸运，没有发生上面情况<br>顺便说一句，线程越多，或者加的数越大越可能出现不安全的问题</li>
 </ul>
 <h1 id="synchronized：“这条桥上一次只能过一个人”"><a href="#synchronized：“这条桥上一次只能过一个人”" class="headerlink" title="synchronized：“这条桥上一次只能过一个人”"></a>synchronized：“这条桥上一次只能过一个人”</h1><h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p><strong><img src="file:///C:\Users\home.11\AppData\Local\Temp\SGPicFaceTpBq\8992\009C5D4E.png" alt="img">互斥、JVM内置锁、对象锁、可重入(避免死锁)</strong></p>
@@ -670,7 +737,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-count">11</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -733,7 +800,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程安全"><span class="nav-number">1.</span> <span class="nav-text">线程安全</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#synchronized：“这条桥上一次只能过一个人”"><span class="nav-number"></span> <span class="nav-text">synchronized：“这条桥上一次只能过一个人”</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关键词"><span class="nav-number">1.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有什么用"><span class="nav-number">2.</span> <span class="nav-text">有什么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么用"><span class="nav-number">3.</span> <span class="nav-text">怎么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么"><span class="nav-number">4.</span> <span class="nav-text">为什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monitor"><span class="nav-number">4.1.</span> <span class="nav-text">Monitor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象头中的Mark-Word"><span class="nav-number">4.2.</span> <span class="nav-text">对象头中的Mark Word</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四种锁状态"><span class="nav-number">4.3.</span> <span class="nav-text">四种锁状态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#偏向锁"><span class="nav-number">4.3.1.</span> <span class="nav-text">偏向锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#轻量级锁"><span class="nav-number">4.3.2.</span> <span class="nav-text">轻量级锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重量级锁"><span class="nav-number">4.3.3.</span> <span class="nav-text">重量级锁</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile"><span class="nav-number">5.</span> <span class="nav-text">volatile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#有什么用-1"><span class="nav-number">5.1.</span> <span class="nav-text">有什么用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生产者消费者"><span class="nav-number">6.</span> <span class="nav-text">生产者消费者</span></a></li></ol></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#进程和线程的关系与区别？"><span class="nav-number">1.</span> <span class="nav-text">进程和线程的关系与区别？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#死锁"><span class="nav-number">2.</span> <span class="nav-text">死锁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#四个必要条件"><span class="nav-number">2.1.</span> <span class="nav-text">四个必要条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决死锁的方法："><span class="nav-number">2.2.</span> <span class="nav-text">解决死锁的方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#死锁、活锁与饥饿"><span class="nav-number">2.3.</span> <span class="nav-text">死锁、活锁与饥饿</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#java内存模型"><span class="nav-number">3.</span> <span class="nav-text">java内存模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#线程安全"><span class="nav-number">3.1.</span> <span class="nav-text">线程安全</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#synchronized：“这条桥上一次只能过一个人”"><span class="nav-number">4.</span> <span class="nav-text">synchronized：“这条桥上一次只能过一个人”</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关键词"><span class="nav-number">4.1.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有什么用"><span class="nav-number">4.2.</span> <span class="nav-text">有什么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么用"><span class="nav-number">4.3.</span> <span class="nav-text">怎么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么"><span class="nav-number">4.4.</span> <span class="nav-text">为什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monitor"><span class="nav-number">4.4.1.</span> <span class="nav-text">Monitor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象头中的Mark-Word"><span class="nav-number">4.4.2.</span> <span class="nav-text">对象头中的Mark Word</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四种锁状态"><span class="nav-number">4.4.3.</span> <span class="nav-text">四种锁状态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#偏向锁"><span class="nav-number">4.4.3.1.</span> <span class="nav-text">偏向锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#轻量级锁"><span class="nav-number">4.4.3.2.</span> <span class="nav-text">轻量级锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重量级锁"><span class="nav-number">4.4.3.3.</span> <span class="nav-text">重量级锁</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#volatile"><span class="nav-number">4.5.</span> <span class="nav-text">volatile</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#有什么用-1"><span class="nav-number">4.5.1.</span> <span class="nav-text">有什么用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生产者消费者"><span class="nav-number">4.6.</span> <span class="nav-text">生产者消费者</span></a></li></ol></li></ol></div>
             
 
           </div>
