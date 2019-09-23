@@ -83,14 +83,14 @@
 
 <meta name="description" content="一文搞懂CAS核心原理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CAS核">
+<meta property="og:title" content="CAS核心原理">
 <meta property="og:url" content="http://yoursite.com/2019/08/25/CAS/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="一文搞懂CAS核心原理">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-28T14:43:10.777Z">
+<meta property="og:updated_time" content="2019-09-23T04:23:10.243Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CAS核">
+<meta name="twitter:title" content="CAS核心原理">
 <meta name="twitter:description" content="一文搞懂CAS核心原理">
 
 
@@ -127,7 +127,7 @@
 
 
 
-  <title>CAS核 | Moonlight's blog</title>
+  <title>CAS核心原理 | Moonlight's blog</title>
   
 
 
@@ -310,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">CAS核</h1>
+          <h1 class="post-title" itemprop="name headline">CAS核心原理</h1>
         
 
         <div class="post-meta">
@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  2.2k
+                  2k
                 </span>
               
 
@@ -427,8 +427,7 @@
       
 
       
-        <p># </p>
-<p>[TOC]</p>
+        <p>[TOC]</p>
 <h1 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h1><h2 id="什么是乐观锁和悲观锁？cas怎么解决更新变量时线程不安全的问题？"><a href="#什么是乐观锁和悲观锁？cas怎么解决更新变量时线程不安全的问题？" class="headerlink" title="什么是乐观锁和悲观锁？cas怎么解决更新变量时线程不安全的问题？"></a>什么是乐观锁和悲观锁？cas怎么解决更新变量时线程不安全的问题？</h2><p>众所周知，悲观锁的先加锁在操作，因为悲观锁悲观的认为一定会有别的线程来修改数据。而乐观锁不同，它先操作，在判断数据是否被修改，修改就重试或者抛出异常，因为乐观锁乐观的认为不会有别的线程来修改数据（有句谚语：原谅比准许更容易得到。）。它两的<strong>关键区别在于是先加锁还是先操作</strong>。Java实现乐观锁最常采用的是CAS无锁算法。</p>
 <p>因为更新的值是原值算出来的，关键在于<strong>如果原值已经被更改了，那么自增的更新值肯定也不对了。</strong>最后一步要赋值的时候，把主内存的值与之前没计算的值做比较，相等一步到位把值更新了，不相等就放弃计算出来的值。</p>
 <p>在多线程更新一个变量的情况下，可能会出现这样的问题，当a线程拷贝了一份主内存的变量到工作内存进行计算的时候，这个变量已经其他线程改变了，a做完了计算，此时的结果的错误的，如果刷新到主内存会覆盖中间其他线程的改变，因此我们希望出现这种情况的时候，<strong>a能检测到此时的数据已经变脏，并把这个计算结果丢弃，重新计算，这就是cas。</strong></p>
@@ -503,14 +502,6 @@
 </ul>
 <p>实例代码</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//创建一个原子更新器</span></span><br><span class="line"> <span class="keyword">private</span> <span class="keyword">static</span> AtomicIntegerFieldUpdater&lt;User&gt; atomicIntegerFieldUpdater =</span><br><span class="line">         AtomicIntegerFieldUpdater.newUpdater(User.class,<span class="string">"old"</span>);</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span></span>&#123;</span><br><span class="line">   	<span class="keyword">volatile</span>  User user = <span class="keyword">new</span> User(<span class="string">"Tom"</span>,<span class="number">15</span>);</span><br><span class="line">     <span class="comment">//原来的年龄</span></span><br><span class="line">     System.out.println(atomicIntegerFieldUpdater.getAndIncrement(user));</span><br><span class="line">     <span class="comment">//现在的年龄</span></span><br><span class="line">     System.out.println(atomicIntegerFieldUpdater.get(user));</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<p>集合</p>
-<p>默认容量</p>
-<p>hashmap KV散列表</p>
-<p>实现1.7数组+双向链表，数组中的每一个元素是一个链表。结合数组和链表的优点。1.8红黑树优化，树化的阈值和最小树化容量，get方法key允许为空</p>
-<p>负载因子0.75扩容</p>
-<p>位操作：2的整次幂、扰动函数、链表的复制</p>
-<p>线程不安全的：更新丢失和链表死循环、集合类的s和hashtable。chm</p>
-<p>与hm：null、安全、字典和map</p>
 
       
     </div>
