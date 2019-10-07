@@ -94,7 +94,7 @@
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E4%B8%83%E5%B1%82.png">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/request%20%281%29.png">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/response.png">
-<meta property="og:updated_time" content="2019-10-07T11:59:49.551Z">
+<meta property="og:updated_time" content="2019-10-07T12:09:36.660Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="计算机网络——秋招复习笔记">
 <meta name="twitter:description" content="计算机网络">
@@ -434,8 +434,7 @@
       
 
       
-        <p># </p>
-<p><strong>计算机网络</strong></p>
+        <p><strong>计算机网络</strong></p>
 <p>[TOC]</p>
 <h1 id="TCP"><a href="#TCP" class="headerlink" title="TCP"></a>TCP</h1><h2 id="三次握手？四次挥手？"><a href="#三次握手？四次挥手？" class="headerlink" title="三次握手？四次挥手？"></a>三次握手？四次挥手？</h2><h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a><strong>三次握手</strong></h3><p>​                           <img src="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E4%B8%89%E6%8C%A5.png" alt="1564631382230">                       </p>
 <ul>
@@ -483,15 +482,12 @@
 </ul>
 <p>场景：文件传输、邮件</p>
 <p>udp 数据报文段 首部8字节</p>
-<pre><code>* 
-</code></pre><p>不可靠 省资源</p>
+<p>不可靠 省资源</p>
 <p>场景：即时通信</p>
 <h2 id="可靠传输？流量控制？拥塞控制？"><a href="#可靠传输？流量控制？拥塞控制？" class="headerlink" title="可靠传输？流量控制？拥塞控制？"></a>可靠传输？流量控制？拥塞控制？</h2><p>可靠传输是指</p>
 <ul>
-<li><p>传输的信道不产生差错（出错重发）</p>
-</li>
-<li><p>接受方来得及处理接受到的数据（快了慢点）</p>
-</li>
+<li>传输的信道不产生差错（出错重发）</li>
+<li>接受方来得及处理接受到的数据（快了慢点）</li>
 </ul>
 <p>TCP如何实现可靠传输：</p>
 <ul>
@@ -519,41 +515,29 @@
 <li>物理 比特 物理设备标准光纤接口、网线接口</li>
 </ol>
 <p>还有一种TCP/IP五层模型，就是把应用层、表示层、会话层统一归到应用层。借用一张图。</p>
-<h2 id="有了传输层为什么还需要网络层？或者说网络层和传输层是如何协作的？"><a href="#有了传输层为什么还需要网络层？或者说网络层和传输层是如何协作的？" class="headerlink" title="有了传输层为什么还需要网络层？或者说网络层和传输层是如何协作的？"></a>有了传输层为什么还需要网络层？或者说网络层和传输层是如何协作的？</h2><p>网络层是针对主机与主机之间的服务。而传输层针对的是不同主机进程之间的通信。传输层协议将应用进程的消息传送到网络层，但是它并不涉及消息是怎么在网络层之间传送（这部分是由网络层的路由选择完成的）。网络层真正负责将数据包从源IP地址转发到目标IP地址，而传输层负责将数据包再递交给主机中对应端口的进程。</p>
+<h2 id="有了传输层为什么还需要网络层？"><a href="#有了传输层为什么还需要网络层？" class="headerlink" title="有了传输层为什么还需要网络层？"></a>有了传输层为什么还需要网络层？</h2><p>网络层是针对主机与主机之间的服务。而传输层针对的是不同主机进程之间的通信。传输层协议将应用进程的消息传送到网络层，但是它并不涉及消息是怎么在网络层之间传送（这部分是由网络层的路由选择完成的）。网络层真正负责将数据包从源IP地址转发到目标IP地址，而传输层负责将数据包再递交给主机中对应端口的进程。</p>
 <p>打个比方。房子A中的人要向房子B中的人写信。房子中都有专门负责将主人写好的信投递到邮箱，以及从邮箱接收信件后交到主人手中的管家。那么：</p>
 <p> 房子 = 主机</p>
 <p>信的内容 = 应用程序消息</p>
 <p>信封 = 数据包，带有源端口、目的端口、源IP地址、目的IP地址。</p>
 <p>邮递员 = 网络层协议，知道信从哪个房子开始发的，以及最后要送到哪个具体的房子。</p>
 <p>管家 = 传输层协议，负责将信投入到信箱中、以及从信箱中接收信件。知道这封信是谁写的以及要送到谁手上（具体端口号）</p>
-<p>以上只是个人理解，如有误请联系更正。</p>
 <h2 id="主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？"><a href="#主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？" class="headerlink" title="主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？"></a>主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？</h2><p>当TCP连接建立之后，应用程序就可使用该连接进行数据收发。应用程序将数据提交给TCP，TCP将数据放入自己的缓存，数据会被当做字节流并进行分段，然后加上TCP头部并提交给网络层。再加上IP头后被网络层提交给到目的主机，目的主机的IP层会将分组提交给TCP，TCP根据报文段的头部信息找到相应的socket，并将报文段提交给该socket，socket是和应用关联的，于是数据就提交给了应用。</p>
 <p>对于UDP会简单些，UDP面向报文段。传输层加上UDP头部递交给网络层，再加上IP头部经路由转发到目的主机，目的主机将分组提交给UDP，UDP根据头部信息找到相应的socket，并将报文段提交给该socket，socket是和应用关联的，于是数据就提交给了应用。</p>
-<h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><h2 id="浏览器发起HTTP请求后发生了什么？越详细越好。"><a href="#浏览器发起HTTP请求后发生了什么？越详细越好。" class="headerlink" title="浏览器发起HTTP请求后发生了什么？越详细越好。"></a>浏览器发起HTTP请求后发生了什么？越详细越好。</h2><ul>
-<li><p>当在浏览器输入网址<a href="http://www.baidu.com并敲下回车后：" target="_blank" rel="noopener">www.baidu.com并敲下回车后：</a></p>
-</li>
-<li><p>DNS域名解析，将域名<a href="http://www.baidu.com解析成IP地址" target="_blank" rel="noopener">www.baidu.com解析成IP地址</a></p>
-</li>
-<li><p>发起TCP三次握手，建立TCP连接。浏览器以一个随机端口（1024~65535）向服务器的80端口发起TCP连接。</p>
-</li>
-<li><p>在TCP连接上发起HTTP请求。</p>
-</li>
-<li><p>服务端响应HTTP请求，将html代码返回给浏览器。</p>
-</li>
-<li><p>浏览器解析html代码，请求html中的资源</p>
-</li>
-<li><p>浏览器对页面进行渲染呈现给用户</p>
-</li>
+<h1 id="HTTP"><a href="#HTTP" class="headerlink" title="HTTP"></a>HTTP</h1><h2 id="浏览器发起HTTP请求后发生了什么？"><a href="#浏览器发起HTTP请求后发生了什么？" class="headerlink" title="浏览器发起HTTP请求后发生了什么？"></a>浏览器发起HTTP请求后发生了什么？</h2><ul>
+<li>当在浏览器输入网址<a href="http://www.baidu.com并敲下回车后：" target="_blank" rel="noopener">www.baidu.com并敲下回车后：</a></li>
+<li>DNS域名解析，将域名<a href="http://www.baidu.com解析成IP地址" target="_blank" rel="noopener">www.baidu.com解析成IP地址</a></li>
+<li>发起TCP三次握手，建立TCP连接。浏览器以一个随机端口（1024~65535）向服务器的80端口发起TCP连接。</li>
+<li>在TCP连接上发起HTTP请求。</li>
+<li>服务端响应HTTP请求，将html代码返回给浏览器。</li>
+<li>浏览器解析html代码，请求html中的资源</li>
+<li>浏览器对页面进行渲染呈现给用户</li>
 </ul>
 <h2 id="DNS域名解析的请求过程？"><a href="#DNS域名解析的请求过程？" class="headerlink" title="DNS域名解析的请求过程？"></a>DNS域名解析的请求过程？</h2><ul>
-<li><p>先在浏览器自身的DNS缓存中搜索</p>
-</li>
-<li><p>如上述步骤未找到，浏览器搜索操作系统本身的DNS缓存</p>
-</li>
-<li><p>如果在系统DNS缓存中未找到，则尝试读取hosts文件，寻找有没有该域名对应的IP</p>
-</li>
-<li><p>果hosts文件中没找到，浏览器会向本地配置的首选DNS服务器发起域名解析请求 。运营商的DNS服务器首先查找自身的缓存，若找到对应的条目且没有过期，则解析成功。如果没有找到，运营商的DNS代我们的浏览器，以根域名-&gt;顶级域名-&gt;二级域名-&gt;三级域名这样的顺序发起迭代DNS解析请求。</p>
-</li>
+<li>先在浏览器自身的DNS缓存中搜索</li>
+<li>如上述步骤未找到，浏览器搜索操作系统本身的DNS缓存</li>
+<li>如果在系统DNS缓存中未找到，则尝试读取hosts文件，寻找有没有该域名对应的IP</li>
+<li>果hosts文件中没找到，浏览器会向本地配置的首选DNS服务器发起域名解析请求 。运营商的DNS服务器首先查找自身的缓存，若找到对应的条目且没有过期，则解析成功。如果没有找到，运营商的DNS代我们的浏览器，以根域名-&gt;顶级域名-&gt;二级域名-&gt;三级域名这样的顺序发起迭代DNS解析请求。</li>
 </ul>
 <h2 id="请求和响应的报文结构（格式）？"><a href="#请求和响应的报文结构（格式）？" class="headerlink" title="请求和响应的报文结构（格式）？"></a>请求和响应的报文结构（格式）？</h2><p>HTTP请求的报文格式：</p>
 <p><img src="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/request%20%281%29.png" alt="1564631437001"></p>
@@ -618,29 +602,20 @@
 </ol>
 <h2 id="常见的状态码？"><a href="#常见的状态码？" class="headerlink" title="常见的状态码？"></a>常见的状态码？</h2><ul>
 <li>1XX：信息性状态码，表示接收的请求正在处理</li>
-<li><p>2XX：成功状态码，表示请求正常处理完毕</p>
-</li>
-<li><p>3XX：重定向状态码，表示需要进行附加操作以完成请求</p>
-</li>
-<li><p>4XX：客户端错误状态码，表示服务器无法处理请求</p>
-</li>
-<li><p>5XX：服务端错误状态码，表示服务器处理请求出错</p>
-</li>
+<li>2XX：成功状态码，表示请求正常处理完毕</li>
+<li>3XX：重定向状态码，表示需要进行附加操作以完成请求</li>
+<li>4XX：客户端错误状态码，表示服务器无法处理请求</li>
+<li>5XX：服务端错误状态码，表示服务器处理请求出错</li>
 </ul>
 <p>常见的状态码有：</p>
 <ul>
 <li>200 OK，请求被正常处理</li>
 <li>301 Move Permanently，永久性重定向</li>
-<li><p>302 Found，临时性重定向</p>
-</li>
-<li><p>400 Bad Request，请求报文中存在语法错误</p>
-</li>
-<li><p>403 Forbidden，对请求资源的访问被服务器拒绝</p>
-</li>
-<li><p>404 Not Found，在服务器上不能找到请求的资源</p>
-</li>
-<li><p>500 Internal Server Error，服务器内部错误</p>
-</li>
+<li>302 Found，临时性重定向</li>
+<li>400 Bad Request，请求报文中存在语法错误</li>
+<li>403 Forbidden，对请求资源的访问被服务器拒绝</li>
+<li>404 Not Found，在服务器上不能找到请求的资源</li>
+<li>500 Internal Server Error，服务器内部错误</li>
 </ul>
 <h2 id="HTTP-1-0和HTTP-1-1的主要区别是什么？"><a href="#HTTP-1-0和HTTP-1-1的主要区别是什么？" class="headerlink" title="HTTP 1.0和HTTP 1.1的主要区别是什么？"></a>HTTP 1.0和HTTP 1.1的主要区别是什么？</h2><p>HTTP1.0最早在网页中使用是在1996年，那个时候只是使用一些较为简单的网页上和网络请求上，而HTTP1.1则在1999年才开始广泛应用于现在的各大浏览器网络请求中，同时HTTP1.1也是当前使用最为广泛的HTTP协议。 主要区别主要体现在：</p>
 <p><strong>长连接</strong> :详见下一个问题。</p>
@@ -651,7 +626,6 @@
 <p><strong>节约带宽资源</strong>:HTTP1.0中，存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能，HTTP1.1则在请求头引入了range头域，它允许只请求资源的某个部分，即返回码是206（Partial Content），这样就方便了开发者自由的选择以便于充分利用带宽和连接。</p>
 <p>Range, 允许只请求资源的某个部分. If-Range另外如果资源与请求字段的ETag相同，则返回一定范围的资源，否则返回全部。如果用If- Match，请求不符合，客户端还会再发送一个请求，多了两倍的功夫。</p>
 <p><strong>错误状态响应码</strong> :在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。</p>
-<hr>
 <h2 id="Http长连接是什么？"><a href="#Http长连接是什么？" class="headerlink" title="Http长连接是什么？"></a>Http长连接是什么？</h2><p><strong>HTTP/1.0默认短连接</strong>，每次请求都要重新建立一次连接。HTTP 是基于TCP/IP协议的,每一次建立或者断开连接都需要三次握手四次挥手的开销，开销会比较大。</p>
 <p><strong>HTTP 1.1默认使用长连接</strong> ,默认开启Connection： keep-alive。 一个tcp连接允许的是6个并发HTTP连接。</p>
 <p><strong>参数：Keep-Alive: timeout=60</strong>最大等待时间，如果配置为0，则表示关掉keepalive，</p>
@@ -671,13 +645,13 @@
 <p>TRACE: 让服务端将之前的请求通信返回给客户端的方法（因此客户端可以得知请求是怎么一步步到服务端的）。主要用于测试或诊断。</p>
 <p>CONNECT: 使用 SSL（Secure Sockets Layer，安全套接层）和 TLS（Transport Layer Security，传输层安全）协议把通信内容加密后经网络隧道传输。</p>
 <h2 id="请求转发与重定向区别"><a href="#请求转发与重定向区别" class="headerlink" title="请求转发与重定向区别"></a>请求转发与重定向区别</h2><p><strong>转发是服务器行为，重定向是客户端行为。</strong></p>
-<ul>
+<h3 id="请求转发"><a href="#请求转发" class="headerlink" title="请求转发"></a>请求转发</h3><ul>
 <li>转发过程：浏览器发送http请求——》服务器接受此请求——》调用内部的一个方法在容器内部完成请求处理和转发动作——》将目标资源发送给浏览器；</li>
 <li>必须是同一个web容器下的url，中间传递的是自己的容器内的request。</li>
 <li>浏览器路径栏：显示第一次访问的路径，客户是感觉不到服务器做了转发的。转</li>
 <li>传输的信息不会丢失。</li>
 </ul>
-<ul>
+<h3 id="重定向"><a href="#重定向" class="headerlink" title="重定向"></a>重定向</h3><ul>
 <li>重定向过程：客户浏览器发送http请求——》web服务器接受后发送302状态码响应及对应新的location给客户浏览器——》客户浏览器发现是302响应，则<strong>自动</strong>再发送一个新的http请求，请求url是新的location地址——》服务器根据此请求寻找资源并发送给客户。</li>
 <li>可以重定向到任意URL，既然是浏览器重新发出了请求，则就没有什么request传递的概念了。</li>
 <li>浏览器路径栏：显示的是其重定向的路径，客户可以观察到地址的变化的。</li>
@@ -687,10 +661,8 @@
 <p><a href="https://www.cnblogs.com/yqin/archive/2010/06/07/1810454.html" target="_blank" rel="noopener">HTTP中的重定向和请求转发的区别</a></p>
 </blockquote>
 <h1 id="SESSION"><a href="#SESSION" class="headerlink" title="SESSION"></a>SESSION</h1><h2 id="cookie和session区别和联系？"><a href="#cookie和session区别和联系？" class="headerlink" title="cookie和session区别和联系？"></a>cookie和session区别和联系？</h2><ol>
-<li><p>保存地方。Session是在<strong>服务端保存</strong>的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是<strong>客户端保存</strong>用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式。</p>
-</li>
-<li><p>实现原理。session的运行依赖session id，而session id是存在cookie中的，也就是说，如果浏览器禁用了cookie ，同时session也会失效（但是可以通过url重写，即在url中传递session_id）</p>
-</li>
+<li>保存地方。Session是在<strong>服务端保存</strong>的一个数据结构，用来跟踪用户的状态，这个数据可以保存在集群、数据库、文件中；Cookie是<strong>客户端保存</strong>用户信息的一种机制，用来记录用户的一些信息，也是实现Session的一种方式。</li>
+<li>实现原理。session的运行依赖session id，而session id是存在cookie中的，也就是说，如果浏览器禁用了cookie ，同时session也会失效（但是可以通过url重写，即在url中传递session_id）</li>
 <li>大小。cookie最多为 300个 , 并且每个不能超过 4KB,每个 Web 站点能设置的 Cookie 总数不能超过 20个。session当访问增多，会比较占用你服务器的性能。</li>
 <li>安全。cookie不安全，可以通过XSS跨域攻击窃取</li>
 </ol>
@@ -908,7 +880,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP"><span class="nav-number">1.</span> <span class="nav-text">TCP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#三次握手？四次挥手？"><span class="nav-number">1.1.</span> <span class="nav-text">三次握手？四次挥手？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手"><span class="nav-number">1.1.1.</span> <span class="nav-text">三次握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四次挥手"><span class="nav-number">1.1.2.</span> <span class="nav-text">四次挥手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他问题"><span class="nav-number">1.1.3.</span> <span class="nav-text">其他问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP为什么需要三次握手？两次不行吗？"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">TCP为什么需要三次握手？两次不行吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四次挥手，为什么客户端发送确认后还需要等待2MSL"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">四次挥手，为什么客户端发送确认后还需要等待2MSL?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么会出现大量的close-wait？"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">为什么会出现大量的close-wait？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SYN-Floold攻击-SYN洪水攻击-？"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">SYN Floold攻击 (SYN洪水攻击)？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#client故障了怎么办？"><span class="nav-number">1.1.3.5.</span> <span class="nav-text">client故障了怎么办？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP和UDP的区别？"><span class="nav-number">1.2.</span> <span class="nav-text">TCP和UDP的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可靠传输？流量控制？拥塞控制？"><span class="nav-number">1.3.</span> <span class="nav-text">可靠传输？流量控制？拥塞控制？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络协议"><span class="nav-number">2.</span> <span class="nav-text">网络协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网络的7层模型了解吗？"><span class="nav-number">2.1.</span> <span class="nav-text">网络的7层模型了解吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有了传输层为什么还需要网络层？或者说网络层和传输层是如何协作的？"><span class="nav-number">2.2.</span> <span class="nav-text">有了传输层为什么还需要网络层？或者说网络层和传输层是如何协作的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？"><span class="nav-number">2.3.</span> <span class="nav-text">主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTP"><span class="nav-number">3.</span> <span class="nav-text">HTTP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器发起HTTP请求后发生了什么？越详细越好。"><span class="nav-number">3.1.</span> <span class="nav-text">浏览器发起HTTP请求后发生了什么？越详细越好。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS域名解析的请求过程？"><span class="nav-number">3.2.</span> <span class="nav-text">DNS域名解析的请求过程？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求和响应的报文结构（格式）？"><span class="nav-number">3.3.</span> <span class="nav-text">请求和响应的报文结构（格式）？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GET与POST的对比，或者说区别？"><span class="nav-number">3.4.</span> <span class="nav-text">GET与POST的对比，或者说区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见的状态码？"><span class="nav-number">3.5.</span> <span class="nav-text">常见的状态码？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-1-0和HTTP-1-1的主要区别是什么？"><span class="nav-number">3.6.</span> <span class="nav-text">HTTP 1.0和HTTP 1.1的主要区别是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http长连接是什么？"><span class="nav-number">3.7.</span> <span class="nav-text">Http长连接是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP和-HTTPS的区别？"><span class="nav-number">3.8.</span> <span class="nav-text">HTTP和 HTTPS的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPS的流程？"><span class="nav-number">3.9.</span> <span class="nav-text">HTTPS的流程？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP有哪些请求方法？它们的作用或者说应用场景？"><span class="nav-number">3.10.</span> <span class="nav-text">HTTP有哪些请求方法？它们的作用或者说应用场景？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求转发与重定向区别"><span class="nav-number">3.11.</span> <span class="nav-text">请求转发与重定向区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SESSION"><span class="nav-number">4.</span> <span class="nav-text">SESSION</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie和session区别和联系？"><span class="nav-number">4.1.</span> <span class="nav-text">cookie和session区别和联系？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#session的原理？"><span class="nav-number">4.2.</span> <span class="nav-text">session的原理？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络攻击"><span class="nav-number">5.</span> <span class="nav-text">网络攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、跨站脚本攻击（document-cookie）"><span class="nav-number">5.1.</span> <span class="nav-text">一、跨站脚本攻击（document.cookie）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#防范手段"><span class="nav-number">5.1.0.1.</span> <span class="nav-text">防范手段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-设置-Cookie-为-HttpOnly，防止-脚本调用"><span class="nav-number">5.1.0.1.1.</span> <span class="nav-text">1. 设置 Cookie 为 HttpOnly，防止 脚本调用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-过滤特殊字符"><span class="nav-number">5.1.0.1.2.</span> <span class="nav-text">2. 过滤特殊字符</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、跨站请求伪造（登录信息尚未过期）"><span class="nav-number">5.2.</span> <span class="nav-text">二、跨站请求伪造（登录信息尚未过期）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#攻击原理"><span class="nav-number">5.2.0.1.</span> <span class="nav-text">攻击原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#防范手段-1"><span class="nav-number">5.2.0.2.</span> <span class="nav-text">防范手段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-标识请求来源的地址"><span class="nav-number">5.2.0.2.1.</span> <span class="nav-text">1. 标识请求来源的地址</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-添加校验-Token，生成随机数"><span class="nav-number">5.2.0.2.2.</span> <span class="nav-text">2. 添加校验 Token，生成随机数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-输入验证码"><span class="nav-number">5.2.0.2.3.</span> <span class="nav-text">3. 输入验证码</span></a></li></ol></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#三、SQL-注入攻击"><span class="nav-number">5.3.</span> <span class="nav-text">三、SQL 注入攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-使用参数化查询"><span class="nav-number">5.3.1.</span> <span class="nav-text">1. 使用参数化查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、拒绝服务攻击"><span class="nav-number">5.4.</span> <span class="nav-text">四、拒绝服务攻击</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP"><span class="nav-number">1.</span> <span class="nav-text">TCP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#三次握手？四次挥手？"><span class="nav-number">1.1.</span> <span class="nav-text">三次握手？四次挥手？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三次握手"><span class="nav-number">1.1.1.</span> <span class="nav-text">三次握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四次挥手"><span class="nav-number">1.1.2.</span> <span class="nav-text">四次挥手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他问题"><span class="nav-number">1.1.3.</span> <span class="nav-text">其他问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP为什么需要三次握手？两次不行吗？"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">TCP为什么需要三次握手？两次不行吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#四次挥手，为什么客户端发送确认后还需要等待2MSL"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">四次挥手，为什么客户端发送确认后还需要等待2MSL?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么会出现大量的close-wait？"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">为什么会出现大量的close-wait？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SYN-Floold攻击-SYN洪水攻击-？"><span class="nav-number">1.1.3.4.</span> <span class="nav-text">SYN Floold攻击 (SYN洪水攻击)？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#client故障了怎么办？"><span class="nav-number">1.1.3.5.</span> <span class="nav-text">client故障了怎么办？</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TCP和UDP的区别？"><span class="nav-number">1.2.</span> <span class="nav-text">TCP和UDP的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#可靠传输？流量控制？拥塞控制？"><span class="nav-number">1.3.</span> <span class="nav-text">可靠传输？流量控制？拥塞控制？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络协议"><span class="nav-number">2.</span> <span class="nav-text">网络协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#网络的7层模型了解吗？"><span class="nav-number">2.1.</span> <span class="nav-text">网络的7层模型了解吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有了传输层为什么还需要网络层？"><span class="nav-number">2.2.</span> <span class="nav-text">有了传输层为什么还需要网络层？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？"><span class="nav-number">2.3.</span> <span class="nav-text">主机A向主机B发送数据，在这个过程中，传输层和网络层做了什么？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#HTTP"><span class="nav-number">3.</span> <span class="nav-text">HTTP</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器发起HTTP请求后发生了什么？"><span class="nav-number">3.1.</span> <span class="nav-text">浏览器发起HTTP请求后发生了什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS域名解析的请求过程？"><span class="nav-number">3.2.</span> <span class="nav-text">DNS域名解析的请求过程？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求和响应的报文结构（格式）？"><span class="nav-number">3.3.</span> <span class="nav-text">请求和响应的报文结构（格式）？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GET与POST的对比，或者说区别？"><span class="nav-number">3.4.</span> <span class="nav-text">GET与POST的对比，或者说区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见的状态码？"><span class="nav-number">3.5.</span> <span class="nav-text">常见的状态码？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-1-0和HTTP-1-1的主要区别是什么？"><span class="nav-number">3.6.</span> <span class="nav-text">HTTP 1.0和HTTP 1.1的主要区别是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http长连接是什么？"><span class="nav-number">3.7.</span> <span class="nav-text">Http长连接是什么？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP和-HTTPS的区别？"><span class="nav-number">3.8.</span> <span class="nav-text">HTTP和 HTTPS的区别？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTPS的流程？"><span class="nav-number">3.9.</span> <span class="nav-text">HTTPS的流程？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP有哪些请求方法？它们的作用或者说应用场景？"><span class="nav-number">3.10.</span> <span class="nav-text">HTTP有哪些请求方法？它们的作用或者说应用场景？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求转发与重定向区别"><span class="nav-number">3.11.</span> <span class="nav-text">请求转发与重定向区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求转发"><span class="nav-number">3.11.1.</span> <span class="nav-text">请求转发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重定向"><span class="nav-number">3.11.2.</span> <span class="nav-text">重定向</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SESSION"><span class="nav-number">4.</span> <span class="nav-text">SESSION</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie和session区别和联系？"><span class="nav-number">4.1.</span> <span class="nav-text">cookie和session区别和联系？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#session的原理？"><span class="nav-number">4.2.</span> <span class="nav-text">session的原理？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#网络攻击"><span class="nav-number">5.</span> <span class="nav-text">网络攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、跨站脚本攻击（document-cookie）"><span class="nav-number">5.1.</span> <span class="nav-text">一、跨站脚本攻击（document.cookie）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#防范手段"><span class="nav-number">5.1.0.1.</span> <span class="nav-text">防范手段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-设置-Cookie-为-HttpOnly，防止-脚本调用"><span class="nav-number">5.1.0.1.1.</span> <span class="nav-text">1. 设置 Cookie 为 HttpOnly，防止 脚本调用</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-过滤特殊字符"><span class="nav-number">5.1.0.1.2.</span> <span class="nav-text">2. 过滤特殊字符</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、跨站请求伪造（登录信息尚未过期）"><span class="nav-number">5.2.</span> <span class="nav-text">二、跨站请求伪造（登录信息尚未过期）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#攻击原理"><span class="nav-number">5.2.0.1.</span> <span class="nav-text">攻击原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#防范手段-1"><span class="nav-number">5.2.0.2.</span> <span class="nav-text">防范手段</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-标识请求来源的地址"><span class="nav-number">5.2.0.2.1.</span> <span class="nav-text">1. 标识请求来源的地址</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-添加校验-Token，生成随机数"><span class="nav-number">5.2.0.2.2.</span> <span class="nav-text">2. 添加校验 Token，生成随机数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-输入验证码"><span class="nav-number">5.2.0.2.3.</span> <span class="nav-text">3. 输入验证码</span></a></li></ol></li></ol></li></ol><li class="nav-item nav-level-2"><a class="nav-link" href="#三、SQL-注入攻击"><span class="nav-number">5.3.</span> <span class="nav-text">三、SQL 注入攻击</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-使用参数化查询"><span class="nav-number">5.3.1.</span> <span class="nav-text">1. 使用参数化查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、拒绝服务攻击"><span class="nav-number">5.4.</span> <span class="nav-text">四、拒绝服务攻击</span></a></li></div>
             
 
           </div>

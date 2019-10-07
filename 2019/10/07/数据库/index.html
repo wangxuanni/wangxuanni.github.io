@@ -89,7 +89,7 @@
 <meta property="og:description" content="数据库">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E6%95%B0%E6%8D%AE%E5%BA%93.png">
-<meta property="og:updated_time" content="2019-10-07T11:59:10.340Z">
+<meta property="og:updated_time" content="2019-10-07T12:08:58.794Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="数据库——秋招复习笔记">
 <meta name="twitter:description" content="数据库">
@@ -503,7 +503,6 @@
 <p>不要轻易相信“MyISAM比InnoDB快”之类的经验之谈，这个结论往往不是绝对的。在很多我们已知场景中，InnoDB的速度都可以让MyISAM望尘莫及，尤其是用到了聚簇索引，或者需要访问的数据都可以放入内存的应用。</p>
 </blockquote>
 <p>一般情况下我们选择 InnoDB 都是没有问题的，但是某些情况下你<strong>并不在乎可扩展能力和并发能力，也不需要事务支持，也不在乎崩溃后的安全恢复问题的话</strong>，选择MyISAM也是一个不错的选择。但是一般情况下，我们都是需要考虑到这些问题的。</p>
-<p>### </p>
 <h2 id="数据字段的类型"><a href="#数据字段的类型" class="headerlink" title="数据字段的类型"></a>数据字段的类型</h2><h1 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h1><h2 id="索引数据结构"><a href="#索引数据结构" class="headerlink" title="索引数据结构"></a>索引数据结构</h2><p>常见的MySQL主要有两种结构：Hash索引和B+ Tree索引，我们使用的是InnoDB引擎，默认的是B+树</p>
 <h3 id="hash索引和btree索引区别"><a href="#hash索引和btree索引区别" class="headerlink" title="hash索引和btree索引区别"></a>hash索引和btree索引区别</h3><ol>
 <li>范围</li>
@@ -587,10 +586,8 @@
 <p>等于（=）和in 可以乱序。比如，索引是KEY idx_id_name(<code>seckill_id</code>,<code>name</code>)</p>
 <p>explain select * from seckill where name=’1000元秒杀iphone6’ and seckill_id=1000会走索引。</p>
 <h3 id="如何建立复合索引，可以使sql语句能尽可能匹配到索引？"><a href="#如何建立复合索引，可以使sql语句能尽可能匹配到索引？" class="headerlink" title="如何建立复合索引，可以使sql语句能尽可能匹配到索引？"></a>如何建立复合索引，可以使sql语句能尽可能匹配到索引？</h3><ul>
-<li><p><strong>等于条件的索引放在前面（最左），范围查询放在后面。</strong> a = 1 AND b = 2 AND c &gt; 3 AND d = 4，建立（a, b, d, c）就是不错的选择；</p>
-</li>
-<li><p><strong>先过滤后排序</strong>（ORDER BY）如SELECT * FROM t WHERE c = 100 and d = ‘xyz’ ORDER BY b建立(c, d, b)联合索引就是不错的选择</p>
-</li>
+<li><strong>等于条件的索引放在前面（最左），范围查询放在后面。</strong> a = 1 AND b = 2 AND c &gt; 3 AND d = 4，建立（a, b, d, c）就是不错的选择；</li>
+<li><strong>先过滤后排序</strong>（ORDER BY）如SELECT * FROM t WHERE c = 100 and d = ‘xyz’ ORDER BY b建立(c, d, b)联合索引就是不错的选择</li>
 <li><strong>对于索引列的查询，一般不建议使用LIKE操作</strong>，像LIKE ‘%abc’这样的不能命中索引；不过LIKE ‘abc%’可以命中索引。</li>
 </ul>
 <p><a href="https://www.jb51.net/article/81875.htm" target="_blank" rel="noopener">https://www.jb51.net/article/81875.htm</a>)</p>
