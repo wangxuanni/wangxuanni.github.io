@@ -89,7 +89,7 @@
 <meta property="og:description" content="synchronized与volatile原理解析">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A6%82%E5%BF%B5.png">
-<meta property="og:updated_time" content="2019-10-07T12:35:45.570Z">
+<meta property="og:updated_time" content="2019-10-07T12:50:06.864Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="synchronized与volatile原理解析">
 <meta name="twitter:description" content="synchronized与volatile原理解析">
@@ -538,13 +538,14 @@
 <h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>加入volatile关键字时，会多出一个<strong>lock前缀指令</strong>。lock前缀指令其实就相当于一个内存屏障。<strong>内存屏障是一组处理指令，用来实现对内存操作的顺序限制。</strong>volatile的底层就是通过内存屏障来实现的。</p>
 <p>lock前缀会做两件事情：</p>
 <ul>
-<li><em>将当前处理器缓存行的数据会写回到系统内存。**</em>这可以保证写操作强制被更新到处理器，处理器的值是最新的。**</li>
-<li><em>这个写回内存的操作会引起在其他CPU里缓存了该内存地址的数据无效。**</em>这可以保证每个线程总是去处理器读，而不是使用自己可能过期的缓存数据。**以实现缓存一致性协议，每个处理器通过嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，当处理器要对这个数据进行修改操作的时候，会强制重新从系统内存里把数据读到处理器缓存里。</li>
+<li><strong>将当前处理器缓存行的数据会写回到系统内存。</strong>这可以保证写操作强制被更新到处理器，处理器的值是最新的。</li>
+<li>这个写回内存的操作会引起在其他CPU里缓存了该内存地址的数据无效。<strong>这可以保证每个线程总是去处理器读，而不是使用自己可能过期的缓存数据。</strong>以实现缓存一致性协议，每个处理器通过嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，当处理器要对这个数据进行修改操作的时候，会强制重新从系统内存里把数据读到处理器缓存里。</li>
 </ul>
 <p>也就符合了happens-before原则中——同一时间对volatile变量的写操作总先于读操作，实现了程序的有序性。（如果两个操作的执行顺序无法从happens-before原则中推到出来，那么他们就不能保证有序性，可以随意进行重排序。）</p>
 <h2 id="经典场景"><a href="#经典场景" class="headerlink" title="经典场景"></a>经典场景</h2><p>chm的get方法是<strong>不加锁的</strong>，因为get方法里的共享变量都定义成volatile类型，保证能被多线程的读，但只能被单线程的写。即使一个线程在读一个线程同时在写，根据happen before原则，对volatile字段的写入先于读操作，所以get总能拿到最新的值。这是用volatile替换锁的经典场景。</p>
 <h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><h3 id="为什么wait-notify在Object类里，而把sleep放在Thread类里面？"><a href="#为什么wait-notify在Object类里，而把sleep放在Thread类里面？" class="headerlink" title="为什么wait,notify在Object类里，而把sleep放在Thread类里面？"></a>为什么wait,notify在Object类里，而把sleep放在Thread类里面？</h3><p>sleep和wait的区别在于：sleep方法没有释放锁，而wait方法释放了锁。</p>
 <p>一个线程可以拥有多个对象锁，wait，notify，notifyAll跟对象锁之间是有一个绑定关系的，假如用Thread.wait()，Thread.notify()，Thread.notifyAll()来调用，虚拟机根本就不知道需要操作的对象锁是哪一个。</p>
+<p>a</p>
 
       
     </div>
