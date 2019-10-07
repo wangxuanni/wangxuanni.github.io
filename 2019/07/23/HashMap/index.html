@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索JDK1.8版本的HashMap。">
+<meta name="description" content="HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索**JDK1.8**版本的HashMap。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HashMap深度探索">
 <meta property="og:url" content="http://yoursite.com/2019/07/23/HashMap/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
-<meta property="og:description" content="HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索JDK1.8版本的HashMap。">
+<meta property="og:description" content="HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索**JDK1.8**版本的HashMap。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-10-07T11:38:05.929Z">
+<meta property="og:updated_time" content="2019-10-07T12:46:16.386Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="HashMap深度探索">
-<meta name="twitter:description" content="HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索JDK1.8版本的HashMap。">
+<meta name="twitter:description" content="HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索**JDK1.8**版本的HashMap。">
 
 
 
@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  4.4k
+                  4.5k
                 </span>
               
 
@@ -402,7 +402,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  17min
+                  18min
                 </span>
               
             </div>
@@ -410,7 +410,7 @@
 
           
               <div class="post-description">
-                  HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索JDK1.8版本的HashMap。
+                  HashMap是java使用频率最高的集合类之一。本文将从定义、重要方法源码分析、与其他集合的比较来探索**JDK1.8**版本的HashMap。
               </div>
           
 
@@ -440,13 +440,14 @@
 <h2 id="位运算"><a href="#位运算" class="headerlink" title="位运算"></a>位运算</h2><p>HashMap的位运算可以说是老*猪带胸罩，一套接一套的。</p>
 <h3 id="第一套：扰动函数"><a href="#第一套：扰动函数" class="headerlink" title="第一套：扰动函数"></a>第一套：扰动函数</h3><p>HashMap不是直接使用key的hashcode，而是要做异或加工。<strong>目的是减少散列冲突,使元素能够更均匀的分布在数组中。</strong></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">static final int hash(Object key) &#123;</span><br><span class="line">        int h;</span><br><span class="line">        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-<p>hashcode是一个int类型32位的数，h &gt;&gt;&gt; 16即把hashcode的高16位向右移动到低16位。然后将<strong>hashCode的高16位和低16位异或</strong>，异或混合过后<strong>高16位的特征也掺杂进低16位</strong>，让数字的每一位都参加了散列运算当中。比如,h代表hashcode</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">h:        <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">0000</span> <span class="number">1110</span> <span class="number">1010</span></span><br><span class="line">h&gt;&gt;<span class="number">16</span>:    <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span></span><br><span class="line">h=h^h&gt;&gt;<span class="number">16</span>:<span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">0000</span> <span class="number">1111</span> <span class="number">0001</span> <span class="number">0101</span></span><br></pre></td></tr></table></figure>
+<p>hashcode是一个int类型32位的数，h &gt;&gt;&gt; 16即把hashcode的高16位向右移动到低16位。然后将<strong>hashCode的高16位和低16位异或</strong>，异或混合过后<strong>高16位的特征也掺杂进低16位</strong>，让数字的每一位都参加了散列运算当中。就像下面一样（h代表原本hashcode）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">h:        <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">0000</span> <span class="number">1110</span> <span class="number">1010</span></span><br><span class="line">h&gt;&gt;<span class="number">16</span>:    <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span></span><br><span class="line">newh=h^h&gt;&gt;<span class="number">16</span>:<span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">0000</span> <span class="number">1111</span> <span class="number">0001</span> <span class="number">0101</span></span><br></pre></td></tr></table></figure>
+<p>这样就混合了高位低位数据特征。此外，还有一个重要的原因，在后面使用（length - 1) &amp; hash算下标时，因为length必然是2的次幂，length-1的二进制看起来就是一堆0后面跟着一个1（这个在下面第三套也会提到），如果不做扰动，高位的hashcode大部分情况都用不上。</p>
 <h3 id="第二套：key是如何hash出对应的数组下标？"><a href="#第二套：key是如何hash出对应的数组下标？" class="headerlink" title="第二套：key是如何hash出对应的数组下标？"></a>第二套：key是如何hash出对应的数组下标？</h3><p>hash出应的数组下标理所当然的做法就取余hashcode % length，但jdk用了更有效率的<strong>位操作(length - 1) &amp; hash</strong>来代替取余操作。</p>
 <h3 id="第三套：为什么长度一定要是2的整次幂？"><a href="#第三套：为什么长度一定要是2的整次幂？" class="headerlink" title="第三套：为什么长度一定要是2的整次幂？"></a>第三套：为什么长度一定要是2的整次幂？</h3><p>只有当数组长度是2的整次幂的时候，<strong>(length - 1) &amp; hash才可以代替取余操作hash%length</strong> ，毕竟位运算比取余操作效率更高。当长度是2的整次幂时候，比如8的二进制是1000，肉眼看过去是“一个1后面跟着一堆0”，在减一后就变成了0111，肉眼看过去是”前面全是0后面全是1“。再<strong>和hash与运算出的结果不会超过数组长度，因为前面全是0，与的结果还是0。</strong></p>
 <p>比如长度如果是16，h是上面扰动函数算出的hashcode</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">length-<span class="number">1</span>:     <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">1111</span></span><br><span class="line">h:            <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">1111</span> <span class="number">0000</span> <span class="number">1111</span> <span class="number">0001</span> <span class="number">0101</span></span><br><span class="line">(length-<span class="number">1</span>)&amp;h: <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0000</span> <span class="number">0101</span></span><br></pre></td></tr></table></figure>
-<p>假设有两个个key，他们的hashcode不同，分别为code1和code2code1和code2分别与“前面全是0后面全是1“二进制相与，结果一定不同。<strong>但是，如果code1和code2分别与一个“后面不一定是1“的二进制相与，结果有可能相同</strong></p>
+<p>假设有两个个key，他们的hashcode不同，分别为code1和code2code1和code2分别与“前面全是0后面全是1“二进制相与，结果一定不同。<strong>但是，如果code1和code2分别与一个“后面不一定是1“的二进制相与，结果有可能相同</strong>。</p>
 <h2 id="lazy-load"><a href="#lazy-load" class="headerlink" title="lazy_load"></a>lazy_load</h2><p>HashMap是延迟加载，即构造函数不负责初始化，而是由resize（）扩容承担初始化的责任。</p>
 <p>具体过程是：第一次调用put()方法判断数组是否为空，如果为空调用resize（）扩容方法初始化后再put（）。</p>
 <h2 id="1-7链表插入区别"><a href="#1-7链表插入区别" class="headerlink" title="1.7链表插入区别"></a>1.7链表插入区别</h2><p>HashMap在jdk<strong>1.7中采用头插入法</strong>，在扩容时会改变链表中元素原本的顺序，以至于在并发场景下导致链表成环的问题。</p>

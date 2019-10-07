@@ -88,12 +88,12 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="synchronized与volatile原理解析">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="c:/Users/home.11/Desktop/小a笔记/images/多线程概念.png">
-<meta property="og:updated_time" content="2019-10-07T12:20:40.464Z">
+<meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A6%82%E5%BF%B5.png">
+<meta property="og:updated_time" content="2019-10-07T12:35:45.570Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="synchronized与volatile原理解析">
 <meta name="twitter:description" content="synchronized与volatile原理解析">
-<meta name="twitter:image" content="c:/Users/home.11/Desktop/小a笔记/images/多线程概念.png">
+<meta name="twitter:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A6%82%E5%BF%B5.png">
 
 
 
@@ -452,7 +452,7 @@
 <p>加锁的时候<strong>首先要添加拥有者线程的锁记录</strong>，虚拟机会在当前线程的栈帧中建立一个名为锁记录( Lock Record)的空间,用于存储锁对象目前的Mark Word的拷贝</p>
 <p><strong>然后要修改资源的锁记录</strong>,虚拟机将使用<strong>CAS</strong>操作尝试将对象的 Mark Word更新为指向 Lock record的指针。如果这个更新动作成功了,那么这个线程就拥有了该对象的锁,并且对象 Mark Word的锁标志位将转变为“00”,即表示此对象处于轻量级锁定状态。</p>
 <h3 id="Monitor"><a href="#Monitor" class="headerlink" title="Monitor"></a>Monitor</h3><p>Monitor是<strong>线程私有</strong>的数据结构，每一个线程都有一个可用monitor record列表，它依赖于底层的操作系统的<strong>Mutex Lock（互斥锁）</strong>来实现的线程同步。这种方式就是synchronized最初实现同步的方式，这就是JDK 6之前synchronized效率低的原因。这种依赖于操作系统Mutex Lock所实现的锁我们称之为“重量级锁”，JDK 6中为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”。</p>
-<h3 id="对象头中的Mark-Word"><a href="#对象头中的Mark-Word" class="headerlink" title="对象头中的Mark Word"></a>对象头中的Mark Word<img src="C:\Users\home.11\Desktop\小a笔记\images\多线程概念.png" alt="多线程概念"></h3><p><strong>对象头</strong>：Mark Word（标记字段）、Klass Pointer（类型指针）、数组长度数据（可选）</p>
+<h3 id="对象头中的Mark-Word"><a href="#对象头中的Mark-Word" class="headerlink" title="对象头中的Mark Word"></a>对象头中的Mark Word<img src="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A6%82%E5%BF%B5.png" alt="多线程概念"></h3><p><strong>对象头</strong>：Mark Word（标记字段）、Klass Pointer（类型指针）、数组长度数据（可选）</p>
 <p><strong>实例数据</strong>：存放<strong>类的属性</strong>数据信息，包括父类的属性信息；</p>
 <p><strong>对齐填充</strong>：由于虚拟机要求 对象起始地址必须是8字节的整数倍。填充数据<strong>不是必须的</strong>，仅仅是为了字节对齐；</p>
 <p><strong>Mark Word中四种锁状态标识</strong></p>
@@ -545,7 +545,6 @@
 <h2 id="经典场景"><a href="#经典场景" class="headerlink" title="经典场景"></a>经典场景</h2><p>chm的get方法是<strong>不加锁的</strong>，因为get方法里的共享变量都定义成volatile类型，保证能被多线程的读，但只能被单线程的写。即使一个线程在读一个线程同时在写，根据happen before原则，对volatile字段的写入先于读操作，所以get总能拿到最新的值。这是用volatile替换锁的经典场景。</p>
 <h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><h3 id="为什么wait-notify在Object类里，而把sleep放在Thread类里面？"><a href="#为什么wait-notify在Object类里，而把sleep放在Thread类里面？" class="headerlink" title="为什么wait,notify在Object类里，而把sleep放在Thread类里面？"></a>为什么wait,notify在Object类里，而把sleep放在Thread类里面？</h3><p>sleep和wait的区别在于：sleep方法没有释放锁，而wait方法释放了锁。</p>
 <p>一个线程可以拥有多个对象锁，wait，notify，notifyAll跟对象锁之间是有一个绑定关系的，假如用Thread.wait()，Thread.notify()，Thread.notifyAll()来调用，虚拟机根本就不知道需要操作的对象锁是哪一个。</p>
-<p>a</p>
 
       
     </div>
