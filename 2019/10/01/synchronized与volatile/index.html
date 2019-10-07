@@ -81,17 +81,19 @@
 
 
 
-<meta name="description" content="线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即“以空间换时间”的方式解决线程不安全问题。">
+<meta name="description" content="synchronized与volatile原理解析">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ThreadLocal源码分析">
-<meta property="og:url" content="http://yoursite.com/2019/08/10/ThreadLocal/index.html">
+<meta property="og:title" content="synchronized与volatile原理解析">
+<meta property="og:url" content="http://yoursite.com/2019/10/01/synchronized与volatile/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
-<meta property="og:description" content="线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即“以空间换时间”的方式解决线程不安全问题。">
+<meta property="og:description" content="synchronized与volatile原理解析">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-10-07T11:30:46.129Z">
+<meta property="og:image" content="c:/Users/home.11/Desktop/小a笔记/images/多线程概念.png">
+<meta property="og:updated_time" content="2019-10-07T12:20:40.464Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ThreadLocal源码分析">
-<meta name="twitter:description" content="线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即“以空间换时间”的方式解决线程不安全问题。">
+<meta name="twitter:title" content="synchronized与volatile原理解析">
+<meta name="twitter:description" content="synchronized与volatile原理解析">
+<meta name="twitter:image" content="c:/Users/home.11/Desktop/小a笔记/images/多线程概念.png">
 
 
 
@@ -121,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/08/10/ThreadLocal/">
+  <link rel="canonical" href="http://yoursite.com/2019/10/01/synchronized与volatile/">
 
 
 
 
 
-  <title>ThreadLocal源码分析 | Moonlight's blog</title>
+  <title>synchronized与volatile原理解析 | Moonlight's blog</title>
   
 
 
@@ -293,7 +295,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/08/10/ThreadLocal/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/01/synchronized与volatile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Moonlight">
@@ -310,7 +312,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">ThreadLocal源码分析</h1>
+          <h1 class="post-title" itemprop="name headline">synchronized与volatile原理解析</h1>
         
 
         <div class="post-meta">
@@ -322,8 +324,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-10T21:24:50+08:00">
-                2019-08-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-10-01T23:53:50+08:00">
+                2019-10-01
               </time>
             
 
@@ -363,8 +365,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2019/08/10/ThreadLocal/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2019/08/10/ThreadLocal/" itemprop="commentCount"></span>
+                <a href="/2019/10/01/synchronized与volatile/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/10/01/synchronized与volatile/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,7 +388,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1.1k
+                  3.5k
                 </span>
               
 
@@ -402,7 +404,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  4min
+                  12min
                 </span>
               
             </div>
@@ -410,7 +412,7 @@
 
           
               <div class="post-description">
-                  线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即“以空间换时间”的方式解决线程不安全问题。
+                  synchronized与volatile原理解析
               </div>
           
 
@@ -427,70 +429,123 @@
       
 
       
-        <p>[TOC]</p>
-<p>前言：ThreadLocal线程局部变量，为每一个使用该变量的线程都提供一个变量值的副本，每一个线程都可以独立地改变自己的副本，而不会和其它线程的副本冲突。即“以空间换时间”的方式解决线程不安全问题。</p>
-<p>本文首先对ThreadLocal进行源码分析以阐明其原理，而后介绍ThreadLocal重要的三个知识点：它用来解决冲突的办法——线性探测法、它用来解决内存泄露的办法——弱引用、ThreadLocal的清理时机尤其要注意线程池这个例外。</p>
-<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>ThreadLocal中有一个静态内部类ThreadLocalMap（类似于HashMap但不是）。这个Map的<strong>key是ThreadLocal当前对象，value就是我们存起来的值</strong>。</p>
-<p>下面通过分析重要方法的源码来一探究竟。</p>
-<h4 id="getMap"><a href="#getMap" class="headerlink" title="getMap()"></a>getMap()</h4><p>取得的是当前线程的ThreadLocalMap</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ThreadLocalMap getMap(Thread t) &#123;</span><br><span class="line">       return t.threadLocals;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<p>注意：这个map取得的是Thread类的成员变量ThreadLocalMap</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">class Thread implements Runnable &#123;</span><br><span class="line">//每个线程都有自己ThreadLocalMap！</span><br><span class="line">	ThreadLocal.ThreadLocalMap threadLocals = null;</span><br></pre></td></tr></table></figure>
-<h4 id="set"><a href="#set" class="headerlink" title="set()"></a>set()</h4><p>取当前线程的ThreadLocalMap，key设置为ThreadLocal当前对象，value设置为传入的值</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public void set(T value) &#123;</span><br><span class="line">     Thread t = Thread.currentThread();</span><br><span class="line">     ThreadLocalMap map = getMap(t);</span><br><span class="line">     if (map != null)</span><br><span class="line">         map.set(this, value);</span><br><span class="line">     else</span><br><span class="line">         createMap(t, value);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<h4 id="get"><a href="#get" class="headerlink" title="get()"></a>get()</h4><p>取当前线程的ThreadLocalMap，将threadLocal作为key获取Entry后获取value。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> T <span class="title">get</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     Thread t = Thread.currentThread();</span><br><span class="line">     <span class="comment">//取当前对象的map</span></span><br><span class="line">     ThreadLocalMap map = getMap(t);</span><br><span class="line">     <span class="keyword">if</span> (map != <span class="keyword">null</span>) &#123;</span><br><span class="line">     <span class="comment">//将自己作为key取值</span></span><br><span class="line">         ThreadLocalMap.Entry e = map.getEntry(<span class="keyword">this</span>);</span><br><span class="line">         <span class="keyword">if</span> (e != <span class="keyword">null</span>) &#123;</span><br><span class="line">             <span class="keyword">return</span> (T)e.value;</span><br><span class="line">         &#125;</span><br><span class="line">     &#125;</span><br><span class="line">     <span class="keyword">return</span> setInitialValue();</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="线性探测法"><a href="#线性探测法" class="headerlink" title="线性探测法"></a>线性探测法</h2><p>ThreadLocalMap是典型的使用线性探测法解决hash冲突的：发生冲突，从该位置向后找到表中的下一个空槽放入。这种简单的方法会导致相同hash值的元素挨在一起和其他hash值对应的槽被占用。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">set</span><span class="params">(ThreadLocal&lt;?&gt; key, Object value)</span> </span>&#123;</span><br><span class="line">......</span><br><span class="line"><span class="comment">//发生冲突，循环去找下一个为空的槽</span></span><br><span class="line"><span class="comment">//nextIndex()方法就是在长度范围内做i++的操作</span></span><br><span class="line"> <span class="keyword">for</span> (Entry e = tab[i];</span><br><span class="line">                 e != <span class="keyword">null</span>;</span><br><span class="line">                 e = tab[i = nextIndex(i, len)]) &#123;</span><br><span class="line">                ThreadLocal&lt;?&gt; k = e.get();</span><br><span class="line">				<span class="comment">//key是一样就更新</span></span><br><span class="line">                <span class="keyword">if</span> (k == key) &#123;</span><br><span class="line">                    e.value = value;</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">			<span class="comment">//找到下一个空槽就放进去</span></span><br><span class="line">                <span class="keyword">if</span> (k == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    replaceStaleEntry(key, value, i);</span><br><span class="line">                    <span class="keyword">return</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br></pre></td></tr></table></figure>
-<h2 id="弱引用"><a href="#弱引用" class="headerlink" title="弱引用"></a>弱引用</h2><p>总所周知，只要还有引用指向，这个对象就不会被回收。这是针对强引用而言。如果一个类继承了软引用指向实例，如果这个实例没有其他引用了，只有该类引用了，这个对象会被GC立即回收。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A a = new A();</span><br><span class="line">B b = new B(a);</span><br><span class="line">a = null;//这样a是不会被回收是，因为b还依赖a，造成了内存泄漏。</span><br><span class="line"></span><br><span class="line">b = null;//此时，a才会被回收，因为没有引用指向了</span><br></pre></td></tr></table></figure>
-<p>如果b还有有用，不能赋值为空，岂非a一直不能被回收？非也，我们还可以用弱引用。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A a = new A();</span><br><span class="line">WeakReference b = new WeakReference(a);</span><br><span class="line">a=null//GC会立刻回收A这个对象</span><br></pre></td></tr></table></figure>
-<p>顺便说一嘴，软引用和弱引用一样, 但被GC回收的时候需要多一个条件: 当系统内存不足时才会被回收. 正因为有这个特性, 软引用比弱引用更加适合做缓存对象的引用。</p>
-<p><strong>ThreadLocal使用了弱引用</strong>.key指向ThreadLocal实例，当ThreadLocal外部强引用被回收时候，key虽然还是指向ThreadLocal，但因为是弱引用，GC会发现并回收。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; &#123;</span><br><span class="line">       /** The value associated with this ThreadLocal. */</span><br><span class="line">       Object value;</span><br><span class="line"></span><br><span class="line">       Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">           super(k);</span><br><span class="line">           value = v;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
-<p>通过表格来说明一下，如下：</p>
+        <h1 id="线程安全"><a href="#线程安全" class="headerlink" title="线程安全"></a>线程安全</h1><p>在学synchronized和volatile之前，我们先来了解一个概念——什么是线程安全？<br>线程安全简单来说就在多线程的情况下也不会有问题，看似一句废话，要怎么理解呢<br>比如ArrayList不是线程安全的就是一个线程不安全的类，<br>如果两个线程对可以同一个ArrayList进行add操作会出现什么结果？请看下面代码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class MyTest &#123;</span><br><span class="line">            static List&lt;Integer&gt; list = new ArrayList&lt;&gt;();</span><br><span class="line"></span><br><span class="line">            static class BB implements Runnable &#123;</span><br><span class="line">                @Override</span><br><span class="line">                public void run() &#123;</span><br><span class="line">                    for (int j = 0; j &lt; 10000; j++) &#123;</span><br><span class="line">                        list.add(j);</span><br><span class="line">                    &#125; &#125; &#125;</span><br><span class="line"></span><br><span class="line">public static void main(String[] args) throws InterruptedException&#123;</span><br><span class="line"></span><br><span class="line">                BB b = new BB();</span><br><span class="line">                Thread t1 = new Thread(b);</span><br><span class="line">                Thread t2 = new Thread(b);</span><br><span class="line">                t1.start();</span><br><span class="line">                t2.start();</span><br><span class="line">                t1.join();</span><br><span class="line">                t2.join();</span><br><span class="line"></span><br><span class="line">                System.out.println(list.size());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>问题出在add方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public boolean add(E e) &#123;   ensureCapacityInternal(size + 1);   </span><br><span class="line">elementData[size++] = e;  </span><br><span class="line">return true;&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的程序，可能有三种情况发生：</p>
+<ul>
+<li>数组下标越界。首先要检查容量，必要时进行扩容。每当在数组边界处，如果A线程和B线程同时进入并检查容量，也就是它们都执行完ensureCapacityInternal方法，因为还有一个空间，所以不进行扩容，此时如果A暂停下来，B成功自增；然后接着A从 elementData[size++]=e开始执行，由于A之前已经检查过没有扩容，而B成功自增使得现在没有空余空间了，此时A就会发生数组下标越界。</li>
+<li>小于20000。size++可以看成是 size=size+1，这一行代码包括三个步骤，先读取size，然后将size加1，最后将这个新值写回到size。此时若A和B线程同时读取到size假设为10，B先自增成功size变11，然后回来A因为它读到的size也是10，所以自增后写入size被更新成11，也就是说两次自增，实际上size只增大了1。因此最后的size会小于200。</li>
+<li>等于20000 很幸运，没有发生上面情况<br>顺便说一句，线程越多，或者加的数越大越可能出现不安全的问题</li>
+</ul>
+<h1 id="synchronized：“这条桥上一次只能过一个人”"><a href="#synchronized：“这条桥上一次只能过一个人”" class="headerlink" title="synchronized：“这条桥上一次只能过一个人”"></a>synchronized：“这条桥上一次只能过一个人”</h1><h2 id="关键词"><a href="#关键词" class="headerlink" title="关键词"></a>关键词</h2><p>互斥、JVM内置锁、对象锁、可重入(避免死锁)</p>
+<h2 id="有什么用"><a href="#有什么用" class="headerlink" title="有什么用"></a>有什么用</h2><ul>
+<li><strong>原子性</strong>：确保线程互斥的访问同步代码；</li>
+<li><strong>可见性</strong>：保证共享变量的修改能够及时可见，其实是通过Java内存模型中的 <strong>“对一个变量unlock操作之前，必须要同步到主内存中；如果对一个变量进行lock操作，则将会清空工作内存中此变量的值，在执行引擎使用此变量前，需要重新从主内存中load操作或assign操作初始化变量值”</strong> 来保证的；</li>
+<li><strong>有序性</strong>：有效解决重排序问题，即 <strong>“一个unlock操作先行发生(happen-before)于后面对同一个锁的lock操作”</strong>；</li>
+</ul>
+<h2 id="怎么用"><a href="#怎么用" class="headerlink" title="怎么用"></a>怎么用</h2><p>当synchronized作用在实例方法时，监视器锁（monitor）便是<strong>对象实例（this）</strong>；</p>
+<p>当synchronized作用在静态方法时，监视器锁（monitor）便是对象的<strong>Class实例</strong>，因为Class数据存在于永久代，因此静态方法锁相当于该类的一个<strong>全局锁</strong>；</p>
+<p>当synchronized作用在某一个对象实例时，监视器锁（monitor）便是<strong>括号括起来的对象实例</strong>；</p>
+<h2 id="为什么"><a href="#为什么" class="headerlink" title="为什么"></a>为什么</h2><p>想了解synchronized的原理，首先要了解两个东西：对象头中的Mark Word和Monitor，说白了，前者是资源的锁，后者是拥有者线程的锁记录。加锁要修改拥有者和资源的锁记录才行。</p>
+<p>加锁的时候<strong>首先要添加拥有者线程的锁记录</strong>，虚拟机会在当前线程的栈帧中建立一个名为锁记录( Lock Record)的空间,用于存储锁对象目前的Mark Word的拷贝</p>
+<p><strong>然后要修改资源的锁记录</strong>,虚拟机将使用<strong>CAS</strong>操作尝试将对象的 Mark Word更新为指向 Lock record的指针。如果这个更新动作成功了,那么这个线程就拥有了该对象的锁,并且对象 Mark Word的锁标志位将转变为“00”,即表示此对象处于轻量级锁定状态。</p>
+<h3 id="Monitor"><a href="#Monitor" class="headerlink" title="Monitor"></a>Monitor</h3><p>Monitor是<strong>线程私有</strong>的数据结构，每一个线程都有一个可用monitor record列表，它依赖于底层的操作系统的<strong>Mutex Lock（互斥锁）</strong>来实现的线程同步。这种方式就是synchronized最初实现同步的方式，这就是JDK 6之前synchronized效率低的原因。这种依赖于操作系统Mutex Lock所实现的锁我们称之为“重量级锁”，JDK 6中为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”。</p>
+<h3 id="对象头中的Mark-Word"><a href="#对象头中的Mark-Word" class="headerlink" title="对象头中的Mark Word"></a>对象头中的Mark Word<img src="C:\Users\home.11\Desktop\小a笔记\images\多线程概念.png" alt="多线程概念"></h3><p><strong>对象头</strong>：Mark Word（标记字段）、Klass Pointer（类型指针）、数组长度数据（可选）</p>
+<p><strong>实例数据</strong>：存放<strong>类的属性</strong>数据信息，包括父类的属性信息；</p>
+<p><strong>对齐填充</strong>：由于虚拟机要求 对象起始地址必须是8字节的整数倍。填充数据<strong>不是必须的</strong>，仅仅是为了字节对齐；</p>
+<p><strong>Mark Word中四种锁状态标识</strong></p>
 <table>
 <thead>
 <tr>
-<th>引用类型</th>
-<th>被垃圾回收时间</th>
-<th>用途</th>
+<th style="text-align:left">锁状态</th>
+<th style="text-align:left">存储内容</th>
+<th style="text-align:left">存储内容</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>强引用</td>
-<td>从来不会</td>
-<td>对象的一般状态</td>
+<td style="text-align:left">无锁</td>
+<td style="text-align:left">对象的hashCode、对象分代年龄、是否是偏向锁（0）</td>
+<td style="text-align:left">01</td>
 </tr>
 <tr>
-<td>软引用</td>
-<td>当内存不足时</td>
-<td>对象缓存</td>
+<td style="text-align:left">偏向锁</td>
+<td style="text-align:left">偏向线程ID、偏向时间戳、对象分代年龄、是否是偏向锁（1）</td>
+<td style="text-align:left">01</td>
 </tr>
 <tr>
-<td>弱引用</td>
-<td>正常垃圾回收时</td>
-<td>对象缓存</td>
+<td style="text-align:left">轻量级锁</td>
+<td style="text-align:left">指向栈中锁记录的指针</td>
+<td style="text-align:left">00</td>
 </tr>
 <tr>
-<td>虚引用</td>
-<td>正常垃圾回收时</td>
-<td>跟踪对象的垃圾回收</td>
+<td style="text-align:left">重量级锁</td>
+<td style="text-align:left">指向互斥量（重量级锁）的指针</td>
+<td style="text-align:left">10</td>
 </tr>
 </tbody>
 </table>
-<p><a href="https://juejin.im/post/5b82c02df265da436152f5ad#heading-5" target="_blank" rel="noopener">理解Java的强引用、软引用、弱引用和虚引用</a></p>
-<h2 id="清理时机"><a href="#清理时机" class="headerlink" title="清理时机"></a>清理时机</h2><p>线程退出时，会做一个清理工作，其中就包括清理ThreadLocalMap，即把threadLocals=null。</p>
-<p>而然使用线程池会对线程进行<strong>复用</strong>，就意味当前线程未必会退出，可能会出现内存泄露，<strong>即你不用这个对象了，但它无法被回收。因此最好每次使ThreadLocal.remove()方法将这个变量移除。</strong></p>
-<blockquote>
-<p>参考</p>
-<p>《Java高并发程序设计》</p>
-<p><a href="https://blog.csdn.net/u012104435/article/details/47951357" target="_blank" rel="noopener">解决Hash冲突的几种方法</a></p>
-<p><a href="https://www.jianshu.com/p/d3e1282ba7ca" target="_blank" rel="noopener">ThreadLocal和弱引用</a></p>
-</blockquote>
-<p>​     </p>
+<p><em>注意：无锁和偏向锁使用的是一个标志位，但偏向锁还有是否是偏向锁标志位、线程ID、Epoch等</em></p>
+<p>接下来我将顺着标识位来讲synchronized的四种锁状态。</p>
+<h3 id="四种锁状态"><a href="#四种锁状态" class="headerlink" title="四种锁状态"></a>四种锁状态</h3><p>JDK 6之前synchronized效率低，是因为依赖于操作系统Mutex Lock，即“重量级锁”，阻塞或唤醒一个Java线程需要操作系统切换CPU状态来完成，这种状态转换需要耗费处理器时间。JDK 6中为了减少获得锁和释放锁带来的性能消耗，引入了“偏向锁”和“轻量级锁”。</p>
+<p>JDK 6之后的synchronized锁级别从低到高依次是：<strong>无锁、偏向锁、轻量级锁和重量级锁。锁状态只能升级不能降级。</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>锁</strong></th>
+<th>消耗</th>
+<th><strong>缺点</strong></th>
+<th><strong>适用场景</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>偏向锁</td>
+<td>加锁和解锁时对比Mark Word，只需一次CAS原子指令</td>
+<td>如果线程间存在锁竞争，会带来额外的锁撤销的消耗</td>
+<td>适用于只有一个线程访问同步块场景</td>
+</tr>
+<tr>
+<td>轻量级锁</td>
+<td>将Mark word拷贝到栈帧的锁记录中，再将Mark Word替换为锁记录的指针。多个CAS操作和自旋。</td>
+<td>自旋会消耗<strong>CPU</strong>，但相应时间快</td>
+<td>追求响应速度，同步块执行速度非常快</td>
+</tr>
+<tr>
+<td>重量级锁</td>
+<td>依赖于操作系统Mutex Lock，等待线程被阻塞挂起</td>
+<td>线程阻塞<strong>响应时间缓慢</strong>，但不会消耗CPU</td>
+<td>追求吞吐量，同步块执行速度较长</td>
+</tr>
+</tbody>
+</table>
+<h4 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a><strong>偏向锁</strong></h4><p>HotSpot发现：在大多数情况下，锁总是由同一线程多次获得，不存在多线程竞争，所以出现了偏向锁。其目标就是在只有一个线程执行同步代码块时能够提高性能。</p>
+<p>当一个线程访问同步代码块并获取锁时，会在Mark Word里存储<strong>锁偏向的线程ID</strong>。在线程进入和退出同步块时不再通过CAS操作来加锁和解锁，而是检测Mark Word里是否存储着指向当前线程的偏向锁。引入偏向锁是为了在<strong>无多线程竞争的情况下尽量减少不必要的轻量级锁执行路径</strong>，因为轻量级锁的获取及释放依赖<strong>多次</strong>CAS原子指令，而偏向锁只需要在置换ThreadID的时候依赖<strong>一次</strong>CAS原子指令即可。</p>
+<p>偏向锁只有遇到其他线程尝试竞争偏向锁时，持有偏向锁的线程才会释放锁，线程不会主动释放偏向锁。偏向锁的撤销，需要等待<strong>全局安全点</strong>（在这个时间点上没有字节码正在执行），它会首先暂停拥有偏向锁的线程，判断锁对象是否处于被锁定状态。撤销偏向锁后恢复到无锁（标志位为“01”）或轻量级锁（标志位为“00”）的状态。</p>
+<p>偏向锁在JDK 6及以后的JVM里是默认启用的。可以通过JVM参数关闭偏向锁：-XX:-UseBiasedLocking=false，关闭之后程序默认会进入轻量级锁状态。</p>
+<h4 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a><strong>轻量级锁</strong></h4><p>是指当锁是偏向锁的时候，被另外的线程所访问，偏向锁就会升级为轻量级锁，<strong>其他线程会通过自旋</strong>的形式尝试获取锁，不会阻塞，从而提高性能。</p>
+<p>虚拟机会在当前线程的栈帧中建立一个名为锁记录( Lock Record)的空间,用于存储锁对象目前的Mark Word的拷贝。<br>然后虚拟机将使用<strong>CAS</strong>操作尝试将对象的 Mark Word更新为指向 Lock record的指针。如果这个更新动作成功了,那么这个线程就拥有了该对象的锁,并且对象 Mark Word的锁标志位将转变为“00”,即表示此对象处于轻量级锁定状态。即上面说的加锁要修改拥有者和资源的锁记录才行。</p>
+<p>如果轻量级锁的更新操作失败了，虚拟机首先会检查对象的Mark Word是否指向当前线程的栈帧，如果是就说明当前线程已经拥有了这个对象的锁，那就可以直接进入同步块继续执行，否则说明多个线程竞争锁。</p>
+<p>若当前只有一个等待线程，则该线程通过自旋进行等待。但是当自旋超过一定的次数，或者一个线程在持有锁，一个在自旋，又有<strong>第三个</strong>来访时，轻量级锁升级为重量级锁。</p>
+<h4 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a><strong>重量级锁</strong></h4><p>升级为重量级锁时，锁标志的状态值变为“10”，此时Mark Word中存储的是指向重量级锁的指针，此时<strong>等待锁的线程都会进入阻塞状态。</strong></p>
+<h1 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h1><h2 id="有什么用-1"><a href="#有什么用-1" class="headerlink" title="有什么用"></a>有什么用</h2><p>volatile是一个关键字，用于修饰变量。被其修饰的变量具有可见性和有序性。</p>
+<ul>
+<li><strong>可见性</strong>，当一条线程修改了这个变量的值，新值能被其他线程立刻观察到。其实这里要结合Java内存结构来说：在缓存在本CPU对变量的修改直接写入主内存中，同时这个写操作使得其他CPU中对应变量的缓存行无效，这样其他线程在读取这个变量时候必须从主内存中读取，所以读取到的是最新的，这就是上面说得能被立即“看到”。</li>
+<li><strong>有序性</strong>，即volatile可以<strong>禁止指令重排</strong>。volatile在其汇编代码中有一个lock操作，这个操作相当于一个<strong>内存屏障</strong>，指令重排不能越过内存屏障。具体来说在执行到volatile变量时，内存屏障之前的语句一定被执行过了且结果对后面是已知的，而内存屏障后面的语句一定还没执行到；在volatile变量之前的语句不能被重排后其之后，相反其后的语句也不能被重排到之前。</li>
+</ul>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>加入volatile关键字时，会多出一个<strong>lock前缀指令</strong>。lock前缀指令其实就相当于一个内存屏障。<strong>内存屏障是一组处理指令，用来实现对内存操作的顺序限制。</strong>volatile的底层就是通过内存屏障来实现的。</p>
+<p>lock前缀会做两件事情：</p>
+<ul>
+<li><em>将当前处理器缓存行的数据会写回到系统内存。**</em>这可以保证写操作强制被更新到处理器，处理器的值是最新的。**</li>
+<li><em>这个写回内存的操作会引起在其他CPU里缓存了该内存地址的数据无效。**</em>这可以保证每个线程总是去处理器读，而不是使用自己可能过期的缓存数据。**以实现缓存一致性协议，每个处理器通过嗅探在总线上传播的数据来检查自己缓存的值是不是过期了，当处理器发现自己缓存行对应的内存地址被修改，就会将当前处理器的缓存行设置成无效状态，当处理器要对这个数据进行修改操作的时候，会强制重新从系统内存里把数据读到处理器缓存里。</li>
+</ul>
+<p>也就符合了happens-before原则中——同一时间对volatile变量的写操作总先于读操作，实现了程序的有序性。（如果两个操作的执行顺序无法从happens-before原则中推到出来，那么他们就不能保证有序性，可以随意进行重排序。）</p>
+<h2 id="经典场景"><a href="#经典场景" class="headerlink" title="经典场景"></a>经典场景</h2><p>chm的get方法是<strong>不加锁的</strong>，因为get方法里的共享变量都定义成volatile类型，保证能被多线程的读，但只能被单线程的写。即使一个线程在读一个线程同时在写，根据happen before原则，对volatile字段的写入先于读操作，所以get总能拿到最新的值。这是用volatile替换锁的经典场景。</p>
+<h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><h3 id="为什么wait-notify在Object类里，而把sleep放在Thread类里面？"><a href="#为什么wait-notify在Object类里，而把sleep放在Thread类里面？" class="headerlink" title="为什么wait,notify在Object类里，而把sleep放在Thread类里面？"></a>为什么wait,notify在Object类里，而把sleep放在Thread类里面？</h3><p>sleep和wait的区别在于：sleep方法没有释放锁，而wait方法释放了锁。</p>
+<p>一个线程可以拥有多个对象锁，wait，notify，notifyAll跟对象锁之间是有一个绑定关系的，假如用Thread.wait()，Thread.notify()，Thread.notifyAll()来调用，虚拟机根本就不知道需要操作的对象锁是哪一个。</p>
+<p>a</p>
 
       
     </div>
@@ -515,8 +570,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/08/01/Fast-fail与Fast-safe/" rel="next" title="Fast-fail与Fast-safe">
-                <i class="fa fa-chevron-left"></i> Fast-fail与Fast-safe
+              <a href="/2019/09/01/redis/" rel="next" title="redis详解">
+                <i class="fa fa-chevron-left"></i> redis详解
               </a>
             
           </div>
@@ -525,8 +580,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/08/12/逃逸分析/" rel="prev" title="逃逸分析">
-                逃逸分析 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/10/07/数据库/" rel="prev" title="数据库——秋招复习笔记">
+                数据库——秋招复习笔记 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -682,7 +737,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析"><span class="nav-number">1.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原理"><span class="nav-number">1.1.</span> <span class="nav-text">原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#getMap"><span class="nav-number">1.1.1.</span> <span class="nav-text">getMap()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#set"><span class="nav-number">1.1.2.</span> <span class="nav-text">set()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#get"><span class="nav-number">1.1.3.</span> <span class="nav-text">get()</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线性探测法"><span class="nav-number">2.</span> <span class="nav-text">线性探测法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#弱引用"><span class="nav-number">3.</span> <span class="nav-text">弱引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#清理时机"><span class="nav-number">4.</span> <span class="nav-text">清理时机</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#线程安全"><span class="nav-number">1.</span> <span class="nav-text">线程安全</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#synchronized：“这条桥上一次只能过一个人”"><span class="nav-number">2.</span> <span class="nav-text">synchronized：“这条桥上一次只能过一个人”</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关键词"><span class="nav-number">2.1.</span> <span class="nav-text">关键词</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有什么用"><span class="nav-number">2.2.</span> <span class="nav-text">有什么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#怎么用"><span class="nav-number">2.3.</span> <span class="nav-text">怎么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么"><span class="nav-number">2.4.</span> <span class="nav-text">为什么</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Monitor"><span class="nav-number">2.4.1.</span> <span class="nav-text">Monitor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象头中的Mark-Word"><span class="nav-number">2.4.2.</span> <span class="nav-text">对象头中的Mark Word</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四种锁状态"><span class="nav-number">2.4.3.</span> <span class="nav-text">四种锁状态</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#偏向锁"><span class="nav-number">2.4.3.1.</span> <span class="nav-text">偏向锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#轻量级锁"><span class="nav-number">2.4.3.2.</span> <span class="nav-text">轻量级锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#重量级锁"><span class="nav-number">2.4.3.3.</span> <span class="nav-text">重量级锁</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#volatile"><span class="nav-number">3.</span> <span class="nav-text">volatile</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#有什么用-1"><span class="nav-number">3.1.</span> <span class="nav-text">有什么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">3.2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#经典场景"><span class="nav-number">3.3.</span> <span class="nav-text">经典场景</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他"><span class="nav-number">4.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么wait-notify在Object类里，而把sleep放在Thread类里面？"><span class="nav-number">4.0.1.</span> <span class="nav-text">为什么wait,notify在Object类里，而把sleep放在Thread类里面？</span></a></li></ol></li></ol></div>
             
 
           </div>
