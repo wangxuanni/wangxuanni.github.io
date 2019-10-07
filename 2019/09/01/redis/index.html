@@ -92,8 +92,7 @@
 <meta property="og:image" content="http://javaduqing.oss-cn-hangzhou.aliyuncs.com/QiuniuTransfer/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-6.png">
 <meta property="og:image" content="https://github.com/doocs/advanced-java/raw/master/images/consistent-hashing-algorithm.png">
 <meta property="og:image" content="https://github.com/doocs/advanced-java/raw/master/images/hash-slot.png">
-<meta property="og:image" content="c:/Users/home.11/AppData/Roaming/Typora/typora-user-images/1566649566853.png">
-<meta property="og:updated_time" content="2019-09-23T04:23:33.651Z">
+<meta property="og:updated_time" content="2019-10-07T11:12:31.200Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis详解">
 <meta name="twitter:description" content="写得比较完善的一篇笔记，应该有把握住一些重点。">
@@ -392,7 +391,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  6.2k
+                  7k
                 </span>
               
 
@@ -408,7 +407,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  22min
+                  25min
                 </span>
               
             </div>
@@ -434,6 +433,8 @@
 
       
         <p>[TOC]</p>
+<p>在项目中缓存是如何使用的？缓存如果使用不当会造成什么后果？</p>
+<p>Redis 和 Memcached 有什么区别？Redis 的线程模型是什么？为什么单线程的 Redis 比多线程的 Memcached 效率要高得多？*</p>
 <h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>redis 主要有以下几种数据类型：</p>
 <table>
 <thead>
@@ -554,7 +555,18 @@
 </li>
 </ul>
 <h2 id="主从复制"><a href="#主从复制" class="headerlink" title="主从复制"></a>主从复制</h2><p>数据流是单项的，从master到slave</p>
-<p>全量复制与部分复制</p>
+<h3 id="开启-master-的持久化"><a href="#开启-master-的持久化" class="headerlink" title="开启 master 的持久化"></a>开启 master 的持久化</h3><p>如果用 slave node 作为 master node 的数据热备可能在 master 宕机重启的时候数据是空的，然后可能一经过复制， slave node 的数据也丢了。</p>
+<p>另外，master 的各种备份方案，也需要做。<strong>万一本地的所有文件丢失了</strong>，从备份中挑选一份 rdb 去恢复 master，这样才能<strong>确保启动的时候，是有数据的</strong></p>
+<h3 id="心跳检测"><a href="#心跳检测" class="headerlink" title="心跳检测"></a>心跳检测</h3><p>主从节点互相都会发送 heartbeat 信息。</p>
+<p>master 默认每隔 10秒 发送一次 heartbeat</p>
+<p>而slave 呢：</p>
+<ul>
+<li>slave node 每隔 1秒 发送一个 heartbeat。并检查是否有新的 master node 要连接和复制。</li>
+<li>如果有， slave node 发送 <code>ping</code> 命令给 master node。如果 master 设置了 requirepass，那么 slave node 必须发送 masterauth 的口令过去进行认证。</li>
+<li>master node <strong>第一次执行全量复制</strong>，将所有数据发给 slave node。</li>
+<li>而在后续，master node 持续将写命令，<strong>异步复制</strong>给 slave node。</li>
+</ul>
+<h3 id="每次写请求异步复制"><a href="#每次写请求异步复制" class="headerlink" title="每次写请求异步复制"></a>每次写请求异步复制</h3><p>master 每次接收到写命令之后，先在内部写入数据，然后<strong>异步</strong>发送给 slave node。</p>
 <h3 id="全量复制"><a href="#全量复制" class="headerlink" title="全量复制"></a>全量复制</h3><ul>
 <li>从服务器向主服务器发送PSYNC命令，；第一次的话，slave不知道master 的 runid，所以是？,偏移量是-1</li>
 </ul>
@@ -569,7 +581,7 @@
 <li>Salve会先清除原来的数据，加载RDB和缓冲区数据，写入本地磁盘，然后再从本地磁盘加载到内存</li>
 </ul>
 <p>过程如下图：<br><img src="http://javaduqing.oss-cn-hangzhou.aliyuncs.com/QiuniuTransfer/Redis%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6-5.png" alt="这里写图片描述"></p>
-<p><strong>全量复制的开销包括以下几个方面：</strong></p>
+<h4 id="开销"><a href="#开销" class="headerlink" title="开销"></a><strong>开销</strong></h4><p>包括以下几个方面：</p>
 <ol>
 <li>bgsave时间</li>
 <li>RDB文件网络传输时间</li>
@@ -590,12 +602,11 @@
 <li><p>如果未超过则，将repl_back_buffer中存储的数据发送给slave，slave完成数据的同步</p>
 </li>
 </ol>
-<p>heartbeat</p>
-<p>主从节点互相都会发送 heartbeat 信息。</p>
-<p>master 默认每隔 10秒 发送一次 heartbeat，slave node 每隔 1秒 发送一个 heartbeat。</p>
-<h2 id="哨兵保证高可用"><a href="#哨兵保证高可用" class="headerlink" title="哨兵保证高可用"></a>哨兵保证高可用</h2><h3 id="三个定时任务"><a href="#三个定时任务" class="headerlink" title="三个定时任务"></a>三个定时任务</h3><p>（1）每隔10s每个sentinel会对master节点和slave节点执行info命令。作用就是发现slave节点，并且确认主从关系</p>
-<p>（2）每隔两秒，sentinel都会通过master节点内部的channel来<strong>交换信息</strong>（基于发布订阅）每个哨兵都会往 <code>__sentinel__:hello</code> 这个 channel 里发送一个消息，这时候所有其他哨兵都可以消费到这个消息，并感知到其他的哨兵的存在。</p>
-<p>（3） 每隔一秒每个sentinel对其他的redis节点（master，slave，sentinel）执行ping操作，对于master来说，若超过30s内没有回复，就对该master进行主观下线并询问其他的Sentinel节点是否可以客观下线</p>
+<h2 id="哨兵保证高可用"><a href="#哨兵保证高可用" class="headerlink" title="哨兵保证高可用"></a>哨兵保证高可用</h2><p>哨兵使用是raft协议在宕机时的选举保障集群高可用，raft是一个强一致性算法。</p>
+<p>用<strong>流言协议</strong>（gossip protocols)来接收关于主服务器是否下线的信息。</p>
+<h3 id="三个定时任务"><a href="#三个定时任务" class="headerlink" title="三个定时任务"></a>三个定时任务</h3><p>（1）<strong>每隔10s确认主从关系。</strong>每个sentinel会对master节点和slave节点执行info命令，作用就是发现slave节点。当一个主服务器被 Sentinel 标记为客观下线时， Sentinel 向下线主服务器的所有从服务器发送 INFO 命令的频率会从 10 秒一次改为每秒一次。</p>
+<p>（2）<strong>每隔两秒，sentinel都会通过master节点内部的channel来交换信息（基于发布订阅）</strong>。 信息包括Sentinel 的 IP 地址、端口号和运行 ID （runid），互相感知到其他的哨兵的存在。</p>
+<p>（3） <strong>每隔一秒每个sentinel对其他的redis节点（master，slave，sentinel）执行ping操作</strong>，对于master来说，若超过30s内没有回复，就对该master进行主观下线并询问其他的Sentinel节点是否可以客观下线。</p>
 <h3 id="主观下线和-客观下线"><a href="#主观下线和-客观下线" class="headerlink" title="主观下线和 客观下线"></a>主观下线和 客观下线</h3><ul>
 <li>sdown 是主观宕机，就一个哨兵如果自己觉得一个 master 宕机了，那么就是主观宕机</li>
 <li>odown 是客观宕机，如果 quorum 数量的哨兵都觉得一个 master 宕机了，那么就是客观宕机</li>
@@ -699,23 +710,44 @@
 <h3 id="缓存击穿"><a href="#缓存击穿" class="headerlink" title="缓存击穿"></a>缓存击穿</h3><p>缓存击穿，就是说某个 key 非常热点，访问非常频繁，处于集中式高并发访问的情况，<strong>当这个 key 在失效的瞬间</strong>，大量的请求就击穿了缓存，直接请求数据库，就像是在一道屏障上凿开了一个洞。</p>
 <p>解决方式也很简单，可以将热点数据设置为永远不过期；或者基于 redis or zookeeper 实现互斥锁，等待第一个请求构建完缓存之后，再释放锁，进而其它请求才能通过该 key 访问数据。</p>
 <h2 id="缓存与数据库的双写一致性"><a href="#缓存与数据库的双写一致性" class="headerlink" title="缓存与数据库的双写一致性"></a>缓存与数据库的双写一致性</h2><p>问题1：先更新数据库，再删除缓存。如果删除缓存失败了，那么会导致数据库中是新数据，缓存中是旧数据，数据就出现了不一致。</p>
-<p>解决思路：先删除缓存，再更新数据库。如果数据库更新失败了，那么数据库中是旧数据，缓存中是空的，那么数据不会不一致。因为读的时候缓存没有，所以去读了数据库中的旧数据，然后更新到缓存中。（每天上亿的读请求，每秒并发读几万）</p>
+<p>解决思路：<strong>先删除缓存，再更新数据库。</strong>如果数据库更新失败了，那么数据库中是旧数据，缓存中是空的，那么数据不会不一致。因为读的时候缓存没有，所以去读了数据库中的旧数据，然后更新到缓存中。（每天上亿的读请求，每秒并发读几万）</p>
 <p>问题2：数据发生了变更，先删除了缓存，然后要去修改数据库，此时还没修改。一个请求过来，去读缓存，发现缓存空了，去查询数据库，查到了修改前的旧数据，放到了缓存中。随后数据变更的程序完成了数据库的修改。造成不一致<br>解决思路(1)：写请求先删除缓存，再去更新数据库，（异步等待段时间)再删除缓存（成功表示有脏数据出现）。这种方案读取快速，但会出现短时间的脏数据。</p>
-<p>解决思路(2)：写请求先修改缓存为指定值，再去更新数据库，再更新缓存。读请求过来后，先读缓存，判断是指定值后进入循环状态，等待写请求更新缓存。如果循环超时就去数据库读取数据，更新缓存。这种方案保证了读写的一致性，但是读请求会等待写操作的完成，降低了吞吐量</p>
-<h2 id="Redis-并发竞争解决方案"><a href="#Redis-并发竞争解决方案" class="headerlink" title="Redis 并发竞争解决方案"></a>Redis 并发竞争解决方案</h2><p>问题：多客户端同时并发写一个 key，会造成更新丢失。</p>
-<p>分布式锁（zookeeper）+时间戳</p>
-<p>分布式锁保证同一时间只能有一个客户端实实例在操作数据。mysql 数据要有一个时间戳。<strong>写之前，先判断</strong>一下当前这个 value 的时间戳是否比缓存里的 value 的时间戳要新。不能用旧的数据覆盖新的数据。</p>
-<p><img src="C:\Users\home.11\AppData\Roaming\Typora\typora-user-images\1566649566853.png" alt="1566649566853"></p>
-<h2 id="生产环境中的-Redis-是怎么部署的？"><a href="#生产环境中的-Redis-是怎么部署的？" class="headerlink" title="生产环境中的 Redis 是怎么部署的？"></a>生产环境中的 Redis 是怎么部署的？</h2><h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><h3 id="慢查询"><a href="#慢查询" class="headerlink" title="慢查询"></a>慢查询</h3><ol>
+<p>解决思路(2)：<strong>写请求先修改缓存为指定值，再去更新数据库</strong>，再更新缓存。读请求过来后，先读缓存，判断是指定值后进入循环状态，等待写请求更新缓存。如果循环超时就去数据库读取数据，更新缓存。这种方案保证了读写的一致性，但是读请求会等待写操作的完成，降低了吞吐量</p>
+<h2 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h2><p> 3 个考量点：</p>
+<ul>
+<li>互斥（只能有一个客户端获取锁）</li>
+<li>不能死锁</li>
+<li>容错（只要大部分 redis 节点创建了这把锁就可以）</li>
+</ul>
+<h3 id="setnx"><a href="#setnx" class="headerlink" title="setnx"></a><code>setnx</code></h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET resource_name my_random_value NX PX 30000</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>NX</code>：表示只有 <code>key</code> 不存在的时候才会设置成功。（如果此时 redis 中存在这个 key，那么设置失败，返回 <code>nil</code>）</li>
+<li><code>PX 30000</code>：意思是 30s 后锁自动释放。别人创建的时候如果发现已经有了就不能加锁了。</li>
+</ul>
+<p>但这种简单的实现方式，如果单实例，就单点故障。如果是普通主从，如果主节点挂了（key 就没有了），key 还没同步到从节点，此时从节点切换为主节点，别人就可以 set key，从而拿到锁。</p>
+<h4 id="RedLock-算法"><a href="#RedLock-算法" class="headerlink" title="RedLock 算法"></a>RedLock 算法</h4><p>这个场景是假设有一个 redis cluster，有 5 个 redis master 实例。然后执行如下步骤获取一把锁：</p>
+<ol>
+<li>获取当前时间戳，单位是毫秒；</li>
+<li>跟上面类似，轮流尝试在每个 master 节点上创建锁，过期时间较短，一般就几十毫秒；</li>
+<li>尝试在<strong>大多数节点</strong>上建立一个锁，比如 5 个节点就要求是 3 个节点 <code>n / 2 + 1</code>；</li>
+<li>客户端计算建立好锁的时间，如果建立锁的时间小于超时时间，就算建立成功了；</li>
+<li>要是锁建立失败了，那么就依次之前建立过的锁删除；</li>
+<li>只要别人建立了一把分布式锁，你就得<strong>不断轮询去尝试获取锁</strong>。</li>
+</ol>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>此处笔记比较潦草简单，可略过不看。</p>
+<h3 id="用redis实现一个异步队列"><a href="#用redis实现一个异步队列" class="headerlink" title="用redis实现一个异步队列"></a>用redis实现一个异步队列</h3><p>有三种方式</p>
+<p>1.prush+lpop 非阻塞，应用层加入sleep机制<br>2.prush+bpop阻塞 只能供一个消费者消费<br>2.pub+sub主题订阅 无状态不保证消息一定到达 想要进阶只能用kafka消息队列</p>
+<h3 id="慢查询"><a href="#慢查询" class="headerlink" title="慢查询"></a>慢查询</h3><p>慢查询队列：</p>
+<ol>
 <li>FIFO</li>
 <li>固定长度，超过会丢弃</li>
 <li>保存在内存里</li>
 </ol>
-<p>生命周期，慢查询不是发生在网络请求和排队上，可以看看图</p>
+<p>注意：查询的生命周期，慢查询不是发生在网络请求和排队上</p>
 <p>两个配置 </p>
 <ul>
-<li>showlog-log-slower-than</li>
-<li>showlog-max-len</li>
+<li>showlog-log-slower-than最慢超过多少就会记录</li>
+<li>showlog-max-len队列最大长度</li>
 </ul>
 <p>三个命令 </p>
 <ul>
@@ -724,14 +756,13 @@
 <li>清空慢查询</li>
 </ul>
 <p>运维经验：慢查询定期持久化</p>
-<h3 id="pipeline"><a href="#pipeline" class="headerlink" title="pipeline"></a>pipeline</h3><p>流水线功能<br>什么是流水线 ，redis命令是超快，但网络时间慢。</p>
-<p>把n次命令+n次网络请求变成次命令+1次网络</p>
-<p>只能用客户端实现 </p>
+<h3 id="pipeline"><a href="#pipeline" class="headerlink" title="pipeline"></a>pipeline</h3><p>流水线：redis命令是超快，但网络请求时间慢，于是有了流水线——多个命令一起请求。这样，把n次命令+n次网络请求的时间就缩减为n次命令+1次网络的时间</p>
 <p>使用建议<br>1.注意每次pipeline携带数据量<br>2.pipeline每次只能作用在一个Redis节点上<br>3.M操作和pipeline的区别</p>
-<h3 id="发布订阅"><a href="#发布订阅" class="headerlink" title="发布订阅"></a>发布订阅</h3><p>发布者(publisher)、订阅者(subscriber)、频道(channel) 发布者发布消息到频道上，订阅者订阅频道就会收到消息</p>
+<h3 id="发布订阅"><a href="#发布订阅" class="headerlink" title="发布订阅"></a>发布订阅</h3><p>三个角色：发布者(publisher)、订阅者(subscriber)、频道(channel) </p>
+<p>发布者发布消息到频道上，订阅者订阅频道就会收到消息</p>
 <h4 id="API"><a href="#API" class="headerlink" title="API"></a>API</h4><p>publish<br>unsubscribe<br>subscribe</p>
-<p>与消息队列的区别：不是专业的，新上线的订阅者不会收到一起的消息</p>
-<p>与生产消费模式：生产消费模式中，发布者发布一条，只有一个订阅者能够收到。而redis相当于一个广播</p>
+<p>与消息队列的区别：不是专业的，不能保证消息的可靠。新上线的订阅者不会收到以前的消息。</p>
+<p>与生产消费模式的区别：生产消费模式中，发布者发布一条，只有一个订阅者能够收到。而redis相当于一个广播，每一个订阅者都能收到。</p>
 
       
     </div>
@@ -919,7 +950,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据类型"><span class="nav-number">1.</span> <span class="nav-text">数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为啥-redis-效率这么高？"><span class="nav-number">2.</span> <span class="nav-text">为啥 redis 效率这么高？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过期策略"><span class="nav-number">3.</span> <span class="nav-text">过期策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#redis-过期策略"><span class="nav-number">3.1.</span> <span class="nav-text">redis 过期策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存淘汰机制"><span class="nav-number">3.2.</span> <span class="nav-text">内存淘汰机制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持久化"><span class="nav-number">4.</span> <span class="nav-text">持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB-快照（保存值）"><span class="nav-number">4.1.</span> <span class="nav-text">RDB 快照（保存值）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF-日志（保存命令）"><span class="nav-number">4.2.</span> <span class="nav-text">AOF 日志（保存命令）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB-和-AOF-到底该如何选择"><span class="nav-number">4.3.</span> <span class="nav-text">RDB 和 AOF 到底该如何选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制"><span class="nav-number">5.</span> <span class="nav-text">主从复制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#全量复制"><span class="nav-number">5.1.</span> <span class="nav-text">全量复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部分复制（增量复制）"><span class="nav-number">5.2.</span> <span class="nav-text">部分复制（增量复制）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#哨兵保证高可用"><span class="nav-number">6.</span> <span class="nav-text">哨兵保证高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三个定时任务"><span class="nav-number">6.1.</span> <span class="nav-text">三个定时任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主观下线和-客观下线"><span class="nav-number">6.2.</span> <span class="nav-text">主观下线和 客观下线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sentinel领导选举与法定人数"><span class="nav-number">6.3.</span> <span class="nav-text">sentinel领导选举与法定人数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#master选举算法"><span class="nav-number">6.4.</span> <span class="nav-text">master选举算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slave-配置的自动纠正"><span class="nav-number">6.5.</span> <span class="nav-text">slave 配置的自动纠正</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据丢失"><span class="nav-number">7.</span> <span class="nav-text">数据丢失</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#脑裂"><span class="nav-number">7.1.</span> <span class="nav-text">脑裂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步复制"><span class="nav-number">7.2.</span> <span class="nav-text">异步复制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-集群"><span class="nav-number">8.</span> <span class="nav-text">Redis 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一致性哈希分区"><span class="nav-number">8.1.</span> <span class="nav-text">一致性哈希分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hash-slot-算法"><span class="nav-number">8.2.</span> <span class="nav-text">hash slot 算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高可用"><span class="nav-number">8.3.</span> <span class="nav-text">高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#判断节点宕机，主观-客观下线"><span class="nav-number">8.3.1.</span> <span class="nav-text">判断节点宕机，主观+客观下线</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新master-选举"><span class="nav-number">8.3.2.</span> <span class="nav-text">新master 选举</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节点间的内部通信机制"><span class="nav-number">8.4.</span> <span class="nav-text">节点间的内部通信机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本通信原理"><span class="nav-number">8.4.1.</span> <span class="nav-text">基本通信原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gossip-协议"><span class="nav-number">8.4.2.</span> <span class="nav-text">gossip 协议</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#雪崩、穿透和击穿"><span class="nav-number">9.</span> <span class="nav-text">雪崩、穿透和击穿</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存穿透"><span class="nav-number">9.1.</span> <span class="nav-text">缓存穿透</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存击穿"><span class="nav-number">9.2.</span> <span class="nav-text">缓存击穿</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存与数据库的双写一致性"><span class="nav-number">10.</span> <span class="nav-text">缓存与数据库的双写一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-并发竞争解决方案"><span class="nav-number">11.</span> <span class="nav-text">Redis 并发竞争解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生产环境中的-Redis-是怎么部署的？"><span class="nav-number">12.</span> <span class="nav-text">生产环境中的 Redis 是怎么部署的？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">13.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#慢查询"><span class="nav-number">13.1.</span> <span class="nav-text">慢查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pipeline"><span class="nav-number">13.2.</span> <span class="nav-text">pipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布订阅"><span class="nav-number">13.3.</span> <span class="nav-text">发布订阅</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API"><span class="nav-number">13.3.1.</span> <span class="nav-text">API</span></a></li></ol></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据类型"><span class="nav-number">1.</span> <span class="nav-text">数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为啥-redis-效率这么高？"><span class="nav-number">2.</span> <span class="nav-text">为啥 redis 效率这么高？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#过期策略"><span class="nav-number">3.</span> <span class="nav-text">过期策略</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#redis-过期策略"><span class="nav-number">3.1.</span> <span class="nav-text">redis 过期策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存淘汰机制"><span class="nav-number">3.2.</span> <span class="nav-text">内存淘汰机制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持久化"><span class="nav-number">4.</span> <span class="nav-text">持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB-快照（保存值）"><span class="nav-number">4.1.</span> <span class="nav-text">RDB 快照（保存值）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF-日志（保存命令）"><span class="nav-number">4.2.</span> <span class="nav-text">AOF 日志（保存命令）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB-和-AOF-到底该如何选择"><span class="nav-number">4.3.</span> <span class="nav-text">RDB 和 AOF 到底该如何选择</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#主从复制"><span class="nav-number">5.</span> <span class="nav-text">主从复制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#开启-master-的持久化"><span class="nav-number">5.1.</span> <span class="nav-text">开启 master 的持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#心跳检测"><span class="nav-number">5.2.</span> <span class="nav-text">心跳检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#每次写请求异步复制"><span class="nav-number">5.3.</span> <span class="nav-text">每次写请求异步复制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#全量复制"><span class="nav-number">5.4.</span> <span class="nav-text">全量复制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#开销"><span class="nav-number">5.4.1.</span> <span class="nav-text">开销</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#部分复制（增量复制）"><span class="nav-number">5.5.</span> <span class="nav-text">部分复制（增量复制）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#哨兵保证高可用"><span class="nav-number">6.</span> <span class="nav-text">哨兵保证高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#三个定时任务"><span class="nav-number">6.1.</span> <span class="nav-text">三个定时任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主观下线和-客观下线"><span class="nav-number">6.2.</span> <span class="nav-text">主观下线和 客观下线</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sentinel领导选举与法定人数"><span class="nav-number">6.3.</span> <span class="nav-text">sentinel领导选举与法定人数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#master选举算法"><span class="nav-number">6.4.</span> <span class="nav-text">master选举算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#slave-配置的自动纠正"><span class="nav-number">6.5.</span> <span class="nav-text">slave 配置的自动纠正</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据丢失"><span class="nav-number">7.</span> <span class="nav-text">数据丢失</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#脑裂"><span class="nav-number">7.1.</span> <span class="nav-text">脑裂</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#异步复制"><span class="nav-number">7.2.</span> <span class="nav-text">异步复制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-集群"><span class="nav-number">8.</span> <span class="nav-text">Redis 集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一致性哈希分区"><span class="nav-number">8.1.</span> <span class="nav-text">一致性哈希分区</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hash-slot-算法"><span class="nav-number">8.2.</span> <span class="nav-text">hash slot 算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#高可用"><span class="nav-number">8.3.</span> <span class="nav-text">高可用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#判断节点宕机，主观-客观下线"><span class="nav-number">8.3.1.</span> <span class="nav-text">判断节点宕机，主观+客观下线</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新master-选举"><span class="nav-number">8.3.2.</span> <span class="nav-text">新master 选举</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节点间的内部通信机制"><span class="nav-number">8.4.</span> <span class="nav-text">节点间的内部通信机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#基本通信原理"><span class="nav-number">8.4.1.</span> <span class="nav-text">基本通信原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gossip-协议"><span class="nav-number">8.4.2.</span> <span class="nav-text">gossip 协议</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#雪崩、穿透和击穿"><span class="nav-number">9.</span> <span class="nav-text">雪崩、穿透和击穿</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存穿透"><span class="nav-number">9.1.</span> <span class="nav-text">缓存穿透</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存击穿"><span class="nav-number">9.2.</span> <span class="nav-text">缓存击穿</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存与数据库的双写一致性"><span class="nav-number">10.</span> <span class="nav-text">缓存与数据库的双写一致性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式锁"><span class="nav-number">11.</span> <span class="nav-text">分布式锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#setnx"><span class="nav-number">11.1.</span> <span class="nav-text">setnx</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RedLock-算法"><span class="nav-number">11.1.1.</span> <span class="nav-text">RedLock 算法</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">12.</span> <span class="nav-text">其他</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#用redis实现一个异步队列"><span class="nav-number">12.1.</span> <span class="nav-text">用redis实现一个异步队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#慢查询"><span class="nav-number">12.2.</span> <span class="nav-text">慢查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pipeline"><span class="nav-number">12.3.</span> <span class="nav-text">pipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发布订阅"><span class="nav-number">12.4.</span> <span class="nav-text">发布订阅</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#API"><span class="nav-number">12.4.1.</span> <span class="nav-text">API</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
