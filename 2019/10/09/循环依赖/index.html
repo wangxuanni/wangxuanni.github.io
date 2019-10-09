@@ -88,12 +88,12 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="答：三层缓存">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="c:/Users/home.11/AppData/Roaming/Typora/typora-user-images/1564554784479.png">
-<meta property="og:updated_time" content="2019-10-09T01:01:15.120Z">
+<meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
+<meta property="og:updated_time" content="2019-10-09T01:14:15.291Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring怎么解决循环依赖？">
 <meta name="twitter:description" content="答：三层缓存">
-<meta name="twitter:image" content="c:/Users/home.11/AppData/Roaming/Typora/typora-user-images/1564554784479.png">
+<meta name="twitter:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
 
 
 
@@ -442,7 +442,7 @@
 <li>前提二：比第三种情况，因为是单例的，所以才会用到三级缓存。</li>
 </ul>
 <p>前提一：<strong>是先实例化在设置对象属性的，否则解决field属性的setter方式单例循环依赖将无从谈起。</strong>先来看看spring bean生命周期的一张图。</p>
-<p><img src="C:\Users\home.11\AppData\Roaming\Typora\typora-user-images\1564554784479.png" alt="1564554784479"></p>
+<p><img src="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/bean%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="1564554784479"></p>
 <p>大体的流程就是：实例化&gt;填充属性&gt;initializeBean(调用spring xml中的init 方法)</p>
 <p>循环依赖主要发生在实例化&gt;填充属性这两步。</p>
 <p>前提二：<strong>对于单例来说</strong>，在Spring容器会把对象放在缓存中，而为了解决单例的循环依赖问题，使用了<strong>Spring三级缓存</strong>。</p>
@@ -473,7 +473,6 @@
 <p><a href="https://www.jianshu.com/p/6c359768b1dc" target="_blank" rel="noopener">Spring源码初探-IOC(4)-Bean的初始化-循环依赖的解决</a></p>
 <p><a href="https://blog.csdn.net/u010853261/article/details/77940767" target="_blank" rel="noopener">Spring-bean的循环依赖以及解决方式</a></p>
 </blockquote>
-<p>## </p>
 
       
     </div>
