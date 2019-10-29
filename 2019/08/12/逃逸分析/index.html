@@ -88,7 +88,7 @@
 <meta property="og:site_name" content="Moonlight&#39;s blog">
 <meta property="og:description" content="深入理解Java中的逃逸分析">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-08-12T13:51:45.590Z">
+<meta property="og:updated_time" content="2019-10-29T04:12:07.745Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="逃逸分析">
 <meta name="twitter:description" content="深入理解Java中的逃逸分析">
@@ -427,7 +427,7 @@
       
 
       
-        <p>本文转自掘金<strong>HollisChuang</strong>，<a href="https://javadoop.com/post/AbstractQueuedSynchronizer" target="_blank" rel="noopener">原地址</a>。<br>写的非常好，忍不住转载了。文前是我的笔记。</p>
+        <p>本文转自掘金<strong>HollisChuang</strong>，<a href="https://mp.weixin.qq.com/s/HWIuXNWjyfV-5UVoQG3vSQ" target="_blank" rel="noopener">原地址</a>。<br>写的非常好，忍不住转载了。在文章最后写了自己的笔记。</p>
 <p>[TOC]</p>
 <h2 id="我的笔记"><a href="#我的笔记" class="headerlink" title="我的笔记"></a>我的笔记</h2><h3 id="JIT-技术（即时编译）"><a href="#JIT-技术（即时编译）" class="headerlink" title="JIT 技术（即时编译）"></a>JIT 技术（即时编译）</h3><p>Java需要经过两段编译，第一段是把.java文件转换成.class文件。第二段编译是把.class转换成机器指令的过程。显然，其执行速度必然会比可执行的二进制字节码程序慢很多。为了优化效率，引入了 JIT 。</p>
 <p>当JVM发现某个方法或代码块运行特别频繁的时候，就会认为这是“热点代码”（Hot Spot Code)。然后JIT会把部分“热点代码”翻译成本地机器相关的机器码，并进行优化，然后再把翻译后的机器码缓存起来，以备下次使用。</p>
