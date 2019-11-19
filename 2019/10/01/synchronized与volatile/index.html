@@ -89,7 +89,7 @@
 <meta property="og:description" content="synchronized与volatile原理解析">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E6%A6%82%E5%BF%B5.png">
-<meta property="og:updated_time" content="2019-10-07T12:50:06.864Z">
+<meta property="og:updated_time" content="2019-11-19T15:51:21.970Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="synchronized与volatile原理解析">
 <meta name="twitter:description" content="synchronized与volatile原理解析">
@@ -545,7 +545,6 @@
 <h2 id="经典场景"><a href="#经典场景" class="headerlink" title="经典场景"></a>经典场景</h2><p>chm的get方法是<strong>不加锁的</strong>，因为get方法里的共享变量都定义成volatile类型，保证能被多线程的读，但只能被单线程的写。即使一个线程在读一个线程同时在写，根据happen before原则，对volatile字段的写入先于读操作，所以get总能拿到最新的值。这是用volatile替换锁的经典场景。</p>
 <h1 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h1><h3 id="为什么wait-notify在Object类里，而把sleep放在Thread类里面？"><a href="#为什么wait-notify在Object类里，而把sleep放在Thread类里面？" class="headerlink" title="为什么wait,notify在Object类里，而把sleep放在Thread类里面？"></a>为什么wait,notify在Object类里，而把sleep放在Thread类里面？</h3><p>sleep和wait的区别在于：sleep方法没有释放锁，而wait方法释放了锁。</p>
 <p>一个线程可以拥有多个对象锁，wait，notify，notifyAll跟对象锁之间是有一个绑定关系的，假如用Thread.wait()，Thread.notify()，Thread.notifyAll()来调用，虚拟机根本就不知道需要操作的对象锁是哪一个。</p>
-<p>a</p>
 
       
     </div>
