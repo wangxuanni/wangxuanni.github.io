@@ -81,17 +81,17 @@
 
 
 
-<meta name="description" content="书是从学校图书馆借的，豆瓣评分寥寥，但我觉得海星鸭">
+<meta name="description" content="原来我是自己的对手。——《蜕变》">
 <meta property="og:type" content="article">
-<meta property="og:title" content="《Data Structures and Other Objects Using Java》读书笔记">
-<meta property="og:url" content="http://wangxuanni.top/2018/09/08/数据结构读书笔记/index.html">
+<meta property="og:title" content="2019春">
+<meta property="og:url" content="http://wangxuanni.top/2019/12/14/2019冬/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
-<meta property="og:description" content="书是从学校图书馆借的，豆瓣评分寥寥，但我觉得海星鸭">
+<meta property="og:description" content="原来我是自己的对手。——《蜕变》">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-04-28T11:18:15.263Z">
+<meta property="og:updated_time" content="2019-12-14T15:56:46.475Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="《Data Structures and Other Objects Using Java》读书笔记">
-<meta name="twitter:description" content="书是从学校图书馆借的，豆瓣评分寥寥，但我觉得海星鸭">
+<meta name="twitter:title" content="2019春">
+<meta name="twitter:description" content="原来我是自己的对手。——《蜕变》">
 
 
 
@@ -121,13 +121,13 @@
 
 
 
-  <link rel="canonical" href="http://wangxuanni.top/2018/09/08/数据结构读书笔记/">
+  <link rel="canonical" href="http://wangxuanni.top/2019/12/14/2019冬/">
 
 
 
 
 
-  <title>《Data Structures and Other Objects Using Java》读书笔记 | Moonlight's blog</title>
+  <title>2019春 | Moonlight's blog</title>
   
 
 
@@ -293,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://wangxuanni.top/2018/09/08/数据结构读书笔记/">
+    <link itemprop="mainEntityOfPage" href="http://wangxuanni.top/2019/12/14/2019冬/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Moonlight">
@@ -310,7 +310,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">《Data Structures and Other Objects Using Java》读书笔记</h1>
+          <h1 class="post-title" itemprop="name headline">2019春</h1>
         
 
         <div class="post-meta">
@@ -322,8 +322,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-09-08T14:00:50+08:00">
-                2018-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-12-14T23:56:50+08:00">
+                2019-12-14
               </time>
             
 
@@ -345,8 +345,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/读书笔记/" itemprop="url" rel="index">
-                    <span itemprop="name">读书笔记</span>
+                  <a href="/categories/生活/" itemprop="url" rel="index">
+                    <span itemprop="name">生活</span>
                   </a>
                 </span>
 
@@ -363,8 +363,8 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/09/08/数据结构读书笔记/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count valine-comment-count" data-xid="/2018/09/08/数据结构读书笔记/" itemprop="commentCount"></span>
+                <a href="/2019/12/14/2019冬/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/12/14/2019冬/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  998
+                  950
                 </span>
               
 
@@ -409,6 +409,10 @@
           
 
           
+              <div class="post-description">
+                  原来我是自己的对手。——《蜕变》
+              </div>
+          
 
         </div>
       </header>
@@ -423,34 +427,8 @@
       
 
       
-        <p>书是从学校图书馆借的，豆瓣评分寥寥，但我觉得海星鸭<br><a id="more"></a></p>
-<p><em>段落根据我认为重要程度排名。</em></p>
-<ul>
-<li><p>p84<br>为什么要给自己给一个类写clone的方法？而不是直接调用父类的复制方法。<br>举个栗子，把数组a拷贝到副本b。如果直接去调用父类的复制方法。它会做什么呢？它会把b的引用都指向数组a，也就是说它并没有真正意义上的复制，而是偷懒把新引用指向原本的数组。<br>这样做有什么问题呢？问题在于对a数组修改都会影响到拷贝的副本b。显然这不是我们想要的。<br>所以我们得自己写一个clone类，循环遍历数组，挨个复制。<br>笔记：大家都知道集合有length（）方法，不需要知道怎么实现，只要能用就行了。但当我们自己去写一个集合类的时候，写这个方法就必须要考虑到方方面面了。这本书重点不在于告诉人java有多少个API，而是这些类、方法的实现原理。只有当我们去重写的时候才会深度去思考程序的设计的原理。<br>比如得知数组的长度，那么写属性size就行了，因为数组是固定长度的。<br>但是要得知集合的长度，需要写一个方法遍历得知，因为集合是自动增长的。</p>
-</li>
-<li><p>p8<br>final变量即这个变量是最终版本，不可变更，不能被继承。另外final变量的名称全部大写 。<br>比如一个常量-273。如果把它写成final变量,则是final MINMUM_CELSIUS=-273。<br>什么时候用常量？如果直接写c&lt;-273，那么阅读程序的人会在这里停住，直到想起-273是最小摄氏度为止。<br>当然了，有些众所周知的公式，其原始形式更易识别。</p>
-</li>
-<li><p>用static修饰的话，即使没有生成该对象的实例，也可使用该方法。毕竟如果只是想使用该方法，也没有必要生成一个实例。<br>比如java自带Math类，没有生成实例也可以直接用它生成random随机数的方法 。(Math.random() * 100)。这条语句是意思是生成一个一百以内的随机数。<br>如果没有用static修饰，绝对不能激活空引用的方法。绝不能访问null引用的实例变量。两种情况下都会引发nullpointerexception异常。</p>
-</li>
-<li><p>变量分引用变量和普通变量。<br>除了八种基本类型之一的任何变量，其余都是引向某一对象的引用变量。<br>引用变量：<br>有些为了省事的程序员用“油门对象t正在工作”，而不使用，“t引用的油门对象正在工作”<br>笔记：t不是这个油门对象的命名而是这个油门对象的引用。</p>
-</li>
-<li><p>p49<br>关于取名。名字最好是描述性的词<br>存取方法：比如“toString”；get+，比如”getFlow”<br>修改方法：动词<br>有返回值的静态方法：名词</p>
-</li>
-<li><p>如果方法需要返回多个信息，那么返回数组是一个有效的手段。</p>
-</li>
-<li><p>集合类不用定义容量，每当包要满时，方法就会实现，使得容量翻倍。<br>m*2+1。加1是为了使得即使容量为零，这一动作仍能起作用。</p>
-</li>
-<li><p>如果没有指定修饰符，则为默认访问，也叫包访问。可以访问同一个一个包的类。</p>
-</li>
-<li><p>递归不只是尾递归。</p>
-</li>
-<li><p>java的易移植性：程序变成字节码，这些字节码由jar运行时环境编译，jar可以免费获得，所以程序可以在不同的机器间进行移植。</p>
-</li>
-<li><p>每一个方法有参数，前置条件，返回值。前置条件比如参数c&gt;-273。</p>
-</li>
-<li><p>接口代码单词一般以-able为后缀。</p>
-</li>
-</ul>
+        <p>本想每个季度写一篇，没有做到。也罢，随心吧。<br>6月。虽然当时学校还有课，我还是偷偷溜去广州的一家软件公司实习了。因为穷又不肯将就，找房子一波三折。<br>7月，实习主要在写xml，一开始实习是很兴奋的，在学校呆久了，对外面的一切都很新鲜，公司人都友善。因为便宜房子找的远，通勤一小时左右。每天早上地铁人多，令人难受的不是拥挤浪费时间。而是在那些通勤的人群中，觉得渺小，像自己这样的有那么多个，并没有什么不同。<br>8月，辞职回家了。大半年没有回来。在秋风的夜晚，车窗外再次看到熟悉的楼下超市和钢琴店还有散步的人群，后备箱是我行李，一如当年高考结束，爸爸载我和我的书当回家的场景。而有了租房经历，会更珍惜家。在家一天到晚一个人待着，代码跑步与自己对话。黑夜孤寂，白昼如焚。<br>9月，参加秋招，春招的时候写了两个项目，一个是轮子，一个是网站，还刷完了剑指offer，感谢从前那个努力的自己呀。而秋招的准备是并发包的源码大致看了一遍，如HashMap、CurrentHashMap，syn，volatile啥的。看了两本并发的书，一套视频。还云服务器上自己实践了一遍哨兵选举，主从复制的过程。9月还尝试写一个RPC轮子，以此证明了一件事，等秋招再写一个新的项目是肯定来不及了（捂脸.jpg<br>秋招收获三个Offer。 最终选择了一家杭州的。<br>11月，来杭州。找房子时，选定了一间，坐在床上等房东来签协议。突然觉得特别孤独。当时认真的把社交写进了待办事件，后面交到了一些朋友。杭州的这家公司工作体验很nice，学到不少东西，很多工程环境问题终于不用自己一个人死磕了，组里有资深工程师可以尽情问，有人罩的真是太好了。在公司吃吃喝喝，一个月胖了十斤左右（苦笑）。</p>
+<p>有磕一个女团的cp，可能那两个人还是太年轻了，是喜欢，但不知道怎么温柔的去爱，两个人像是带着爱意大闹一通，燃烧过后只剩下灰烬。出去玩听到不少比我大的姐姐聊被劈腿。对我而言感情等价词就是温暖干净单纯。如果说要经历乱七八糟的事情，我宁愿从来没人来过。<br>翻看上一次的小记，提到的那群牛客认识的小哥哥们也就是apache基金会这个群，在秋招的时候，大家互相内推，每周分享技术，群里讨论问题，复盘面试。tql，群除我佬！广州杭州的都面基了，见过大半个群里的人了，心满意足。感谢你们，让我秋招不是一个人孤军奋战。对我而言，他们是那种，不能在一起也想要回报人群，上次有这种感觉还是在带班的时候。<br>这大半年发生了许多事，是人生一个转折了。我发现有意思的是我总是三年换一个环境，小学初中高中大学。大学那时，有时想抱怨这是什么辣鸡学校，对自己说，是上个三年你所为结果，如果你不满意，你可以改变下一个三年。现在如我所愿改变了，而再下个三年也是如此。</p>
 
       
     </div>
@@ -475,8 +453,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/09/08/《华杉讲透孙子兵法》/" rel="next" title="《华杉讲透孙子兵法》读书笔记">
-                <i class="fa fa-chevron-left"></i> 《华杉讲透孙子兵法》读书笔记
+              <a href="/2019/10/09/循环依赖/" rel="next" title="Spring怎么解决循环依赖？">
+                <i class="fa fa-chevron-left"></i> Spring怎么解决循环依赖？
               </a>
             
           </div>
@@ -484,10 +462,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/09/08/数据库系统工程师（软考）/" rel="prev" title="数据库系统工程师（软考中级）">
-                数据库系统工程师（软考中级） <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
