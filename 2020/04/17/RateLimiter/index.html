@@ -81,22 +81,22 @@
 
 
 
-<meta name="description" content="description: 超详细！限流算法及RateLimiter源码解析前言：之所以对RateLimiter感兴趣，是之前实习的时候有一个需求，需要调用一个qps为10的合成图片接口。因为达不到实时调用的要求，我就写了一个定时任务事先调用该接口把结果放在缓存里面，外部不调用该接口而是去缓存里查数据。重点来了，因为需要合成的图片大概有两三百张，肯定不能直接一次调用该接口，于是用了限流去慢慢调用。代">
+<meta name="description" content="超详细！限流算法及RateLimiter源码解析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="限流算法及RateLimiter源码解析">
 <meta property="og:url" content="http://wangxuanni.top/2020/04/17/RateLimiter/index.html">
 <meta property="og:site_name" content="Moonlight&#39;s blog">
-<meta property="og:description" content="description: 超详细！限流算法及RateLimiter源码解析前言：之所以对RateLimiter感兴趣，是之前实习的时候有一个需求，需要调用一个qps为10的合成图片接口。因为达不到实时调用的要求，我就写了一个定时任务事先调用该接口把结果放在缓存里面，外部不调用该接口而是去缓存里查数据。重点来了，因为需要合成的图片大概有两三百张，肯定不能直接一次调用该接口，于是用了限流去慢慢调用。代">
+<meta property="og:description" content="超详细！限流算法及RateLimiter源码解析">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/ratelimiter/%E6%BB%91%E5%8A%A8.jpg">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/ratelimiter/%E6%BC%8F%E6%A1%B6.png">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/ratelimiter/%E6%A1%B6%E4%BB%A4%E7%89%8C.png">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/ratelimiter/%E6%96%B9%E6%B3%95%E8%B0%83%E7%94%A8.png">
 <meta property="og:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/ratelimiter/%E6%B3%A8%E9%87%8A.png">
-<meta property="og:updated_time" content="2020-04-20T16:21:36.619Z">
+<meta property="og:updated_time" content="2020-04-20T16:25:39.960Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="限流算法及RateLimiter源码解析">
-<meta name="twitter:description" content="description: 超详细！限流算法及RateLimiter源码解析前言：之所以对RateLimiter感兴趣，是之前实习的时候有一个需求，需要调用一个qps为10的合成图片接口。因为达不到实时调用的要求，我就写了一个定时任务事先调用该接口把结果放在缓存里面，外部不调用该接口而是去缓存里查数据。重点来了，因为需要合成的图片大概有两三百张，肯定不能直接一次调用该接口，于是用了限流去慢慢调用。代">
+<meta name="twitter:description" content="超详细！限流算法及RateLimiter源码解析">
 <meta name="twitter:image" content="https://wangxuanni.oss-cn-hongkong.aliyuncs.com/ratelimiter/%E6%BB%91%E5%8A%A8.jpg">
 
 
@@ -415,6 +415,10 @@
           
 
           
+              <div class="post-description">
+                  超详细！限流算法及RateLimiter源码解析
+              </div>
+          
 
         </div>
       </header>
@@ -429,7 +433,7 @@
       
 
       
-        <h2 id="description-超详细！限流算法及RateLimiter源码解析"><a href="#description-超详细！限流算法及RateLimiter源码解析" class="headerlink" title="description: 超详细！限流算法及RateLimiter源码解析"></a>description: 超详细！限流算法及RateLimiter源码解析</h2><h2 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h2><p>之所以对RateLimiter感兴趣，是之前实习的时候有一个需求，需要调用一个qps为10的合成图片接口。因为达不到实时调用的要求，我就写了一个定时任务事先调用该接口把结果放在缓存里面，外部不调用该接口而是去缓存里查数据。重点来了，因为需要合成的图片大概有两三百张，肯定不能直接一次调用该接口，于是用了限流去慢慢调用。代码类似这样：</p>
+        <h2 id="前言："><a href="#前言：" class="headerlink" title="前言："></a>前言：</h2><p>之所以对RateLimiter感兴趣，是之前实习的时候有一个需求，需要调用一个qps为10的合成图片接口。因为达不到实时调用的要求，我就写了一个定时任务事先调用该接口把结果放在缓存里面，外部不调用该接口而是去缓存里查数据。重点来了，因为需要合成的图片大概有两三百张，肯定不能直接一次调用该接口，于是用了限流去慢慢调用。代码类似这样：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RateLimiter rateLimiter = RateLimiter.create(<span class="number">10</span>);</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; <span class="number">200</span>; i++) &#123;</span><br><span class="line">          rateLimiter.acquire();</span><br><span class="line">          System.out.println(<span class="string">"生成第"</span>+i+<span class="string">"张合成图片"</span>);</span><br><span class="line">      &#125;</span><br></pre></td></tr></table></figure>
 <p>当时只是简单的使用了，并没有深究其原理，现在放假有空就把他的源码撸了一遍。</p>
 <h2 id="令牌桶算法："><a href="#令牌桶算法：" class="headerlink" title="令牌桶算法："></a>令牌桶算法：</h2><p>在学习令牌桶算法之前我们现在来看看几种比较简单的限流算法，了解它们有什么问题，令牌桶算法是怎么解决这些问题的</p>
@@ -730,7 +734,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#description-超详细！限流算法及RateLimiter源码解析"><span class="nav-number">1.</span> <span class="nav-text">description: 超详细！限流算法及RateLimiter源码解析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前言："><span class="nav-number">2.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#令牌桶算法："><span class="nav-number">3.</span> <span class="nav-text">令牌桶算法：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#计数器算法"><span class="nav-number">3.1.</span> <span class="nav-text">计数器算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏桶算法"><span class="nav-number">3.2.</span> <span class="nav-text">漏桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#令牌桶算法"><span class="nav-number">3.3.</span> <span class="nav-text">令牌桶算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RateLimiter源码解析："><span class="nav-number">4.</span> <span class="nav-text">RateLimiter源码解析：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍："><span class="nav-number">4.1.</span> <span class="nav-text">介绍：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关键变量"><span class="nav-number">4.2.</span> <span class="nav-text">关键变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#create"><span class="nav-number">4.3.</span> <span class="nav-text">create()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#acquire"><span class="nav-number">4.4.</span> <span class="nav-text">acquire()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#令牌预分发"><span class="nav-number">4.4.1.</span> <span class="nav-text">令牌预分发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#resync-令牌懒加载机制"><span class="nav-number">4.4.2.</span> <span class="nav-text">resync()令牌懒加载机制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#稳定和渐进模式"><span class="nav-number">4.5.</span> <span class="nav-text">稳定和渐进模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#acquire和tryAcquire的区别"><span class="nav-number">5.1.</span> <span class="nav-text">acquire和tryAcquire的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RateLimiter的缺陷"><span class="nav-number">5.2.</span> <span class="nav-text">RateLimiter的缺陷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言："><span class="nav-number">1.</span> <span class="nav-text">前言：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#令牌桶算法："><span class="nav-number">2.</span> <span class="nav-text">令牌桶算法：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#计数器算法"><span class="nav-number">2.1.</span> <span class="nav-text">计数器算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#漏桶算法"><span class="nav-number">2.2.</span> <span class="nav-text">漏桶算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#令牌桶算法"><span class="nav-number">2.3.</span> <span class="nav-text">令牌桶算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RateLimiter源码解析："><span class="nav-number">3.</span> <span class="nav-text">RateLimiter源码解析：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍："><span class="nav-number">3.1.</span> <span class="nav-text">介绍：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关键变量"><span class="nav-number">3.2.</span> <span class="nav-text">关键变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#create"><span class="nav-number">3.3.</span> <span class="nav-text">create()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#acquire"><span class="nav-number">3.4.</span> <span class="nav-text">acquire()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#令牌预分发"><span class="nav-number">3.4.1.</span> <span class="nav-text">令牌预分发</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#resync-令牌懒加载机制"><span class="nav-number">3.4.2.</span> <span class="nav-text">resync()令牌懒加载机制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#稳定和渐进模式"><span class="nav-number">3.5.</span> <span class="nav-text">稳定和渐进模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见问题"><span class="nav-number">4.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#acquire和tryAcquire的区别"><span class="nav-number">4.1.</span> <span class="nav-text">acquire和tryAcquire的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RateLimiter的缺陷"><span class="nav-number">4.2.</span> <span class="nav-text">RateLimiter的缺陷</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
